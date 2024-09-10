@@ -1,3 +1,38 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:fdd5bf6131007f443b13b1e2bdca05b23e18f415d36431e8073fed6873e04885
-size 811
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GameManager : MonoBehaviour
+{
+    Spawner spawner;
+    Block activeBlock;
+    [SerializeField] private float dropInterval = 0.25f;
+    float nextdropTimer;
+    Board board;
+    private void Start()
+    {
+        //初回のブロック
+        spawner = GameObject.FindObjectOfType<Spawner>();
+
+board=GameObject
+
+        if (!activeBlock)
+        {
+            activeBlock = spawner.SpawnBlock();
+        }
+    }
+    //落ちてく処理
+    private void Update()
+    {
+        //クールタイム
+        if (Time.time > nextdropTimer)
+        {
+            nextdropTimer = Time.time + dropInterval;
+            if (activeBlock)
+            {
+                activeBlock.MoveDown();
+            }
+        }
+
+    }
+}

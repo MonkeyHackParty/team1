@@ -1,3 +1,38 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0549b93236670eee22e039e2b4aaaafc8ae7b6ca5ebec13d0bb4498f69715773
-size 761
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.Search;
+using UnityEngine;
+using UnityEngine.Animations;
+
+public class Spawner : MonoBehaviour
+{
+    //配列
+    [SerializeField] Block[] Blocks;
+
+    //ランダムなブロックを返す
+    Block GetRandomBlock()
+    {
+        int i = Random.Range(0, Blocks.Length);
+        if (Blocks[i])
+        {
+            return Blocks[i];
+        }
+        else
+        {
+            return null;
+        }
+    }
+    //生成
+    public Block SpawnBlock()
+    {
+        Block block = Instantiate(GetRandomBlock(), transform.position, Quaternion.identity);
+        if (block)
+        {
+            return block;
+        }
+        else
+        {
+            return null;
+        }
+    }
+}
