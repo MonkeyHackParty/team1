@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 {
     Spawner spawner;
     Block activeBlock;
+    private Block nextBlock;
+
     [SerializeField] private float dropInterval = 0.25f;
     float nextdropTimer;
     Board board;
@@ -32,6 +34,7 @@ public class GameManager : MonoBehaviour
         if (!activeBlock)
         {
             activeBlock = spawner.SpawnBlock();
+            nextBlock = spawner.SpawnBlock(); // 次のブロックを生成
         }
     }
     //落ちてく処理
@@ -94,8 +97,9 @@ public class GameManager : MonoBehaviour
         activeBlock.MoveUp();
         //座標を保存
         board.SaveBlockInGrid(activeBlock);
-        //次の持って来る
-        activeBlock = spawner.SpawnBlock();
+        // 次のブロックをスポーン
+        activeBlock = nextBlock;
+        nextBlock = spawner.SpawnBlock(); // 新しい次のブロックを生成
 
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
