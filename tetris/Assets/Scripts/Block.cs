@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using TreeEditor;
 using UnityEngine;
 
 public class Block : MonoBehaviour
 {
     [SerializeField] private bool canRotate = true;
-//動き方
+
+    [SerializeField] PeaceSpawn[] peaceSpawns;
+    //動き方
     void Move(Vector3 moveDirection)
     {
         transform.position += moveDirection;
     }
-//各種動き
+    //各種動き
     public void MoveLeft()
     {
         Move(new Vector3(-1, 0, 0));
@@ -23,25 +26,37 @@ public class Block : MonoBehaviour
     }
     public void MoveUp()
     {
-        Move(new Vector3(0,1,0));
+        Move(new Vector3(0, 1, 0));
     }
     public void MoveDown()
     {
-        Move(new Vector3(0,-1,0));
+        Move(new Vector3(0, -1, 0));
     }
     //回転
     public void RotateRight()
     {
-        if(canRotate)
+        if (canRotate)
         {
-            transform.Rotate(0,0,90);
+            transform.Rotate(0, 0, 90);
         }
     }
-        public void RotateLeft()
+    public void RotateLeft()
     {
-        if(canRotate)
+        if (canRotate)
         {
-            transform.Rotate(0,0,-90);
+            transform.Rotate(0, 0, -90);
+        }
+    }
+    //ランダムなブロックの中身作成
+    public void MakeRandomPeace()
+    {
+        if (peaceSpawns != null && peaceSpawns.Length > 0)
+        {
+            // 全ての PeaceSpawn に対して SpawnBlockPeace を呼び出す
+            foreach (PeaceSpawn spawn in peaceSpawns)
+            {
+                spawn.SpawnBlockPeace();
+            }
         }
     }
 }

@@ -1,31 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Animations;
 
 public class Spawner : MonoBehaviour
 {
-    //配列
-    [SerializeField] Block[] Blocks;
-
-    //ランダムなブロックを返す
-    Block GetRandomBlock()
+    //次のブロックを受け取って生成してそれを返す
+    public Block SpawnBlock(Block block)
     {
-        int i = Random.Range(0, Blocks.Length);
-        if (Blocks[i])
-        {
-            return Blocks[i];
-        }
-        else
-        {
-            return null;
-        }
-    }
-    //生成
-    public Block SpawnBlock()
-    {
-        Block block = Instantiate(GetRandomBlock(), transform.position, Quaternion.identity);
+        block.transform.position = transform.position;
         if (block)
         {
             return block;

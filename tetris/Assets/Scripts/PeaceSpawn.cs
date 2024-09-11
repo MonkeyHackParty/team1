@@ -18,16 +18,11 @@ public class PeaceSpawn : MonoBehaviour
         }
     }
     //生成
-    public BlockPeace SpawnBlockPeace()
+    public void SpawnBlockPeace()
     {
-        BlockPeace blockpeace = Instantiate(GetRandomBlockPeace(), transform.position, Quaternion.identity);
-        if (blockpeace)
-        {
-            return blockpeace;
-        }
-        else
-        {
-            return null;
-        }
+        Transform parentTransform = transform.parent;
+        Instantiate(GetRandomBlockPeace(), transform.position, Quaternion.identity, parentTransform);
+        Destroy(gameObject);
+        
     }
 }

@@ -6,7 +6,8 @@ public class GameManager : MonoBehaviour
 {
     Spawner spawner;
     Block activeBlock;
-    private Block nextBlock;
+    NextSpawner nextSpawner;
+    Block setBlock;
 
     [SerializeField] private float dropInterval = 0.25f;
     float nextdropTimer;
@@ -17,10 +18,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float nextKeyDownInterval, nextKeyLeftRightInterval, nextKeyRotateInterval;
     private void Start()
     {
-        //初回のブロック
+
         spawner = GameObject.FindObjectOfType<Spawner>();
 
         board = GameObject.FindObjectOfType<Board>();
+
+        nextSpawner = GameObject.FindObjectOfType<NextSpawner>();
 
         //スポナーの位置を綺麗に
         spawner.transform.position = Rounding.Round(spawner.transform.position);
@@ -33,11 +36,16 @@ public class GameManager : MonoBehaviour
 
         if (!activeBlock)
         {
-            activeBlock = spawner.SpawnBlock();
-            nextBlock = spawner.SpawnBlock(); // 次のブロックを生成
+            //初回のブロックを生成してブロックの中身をランダムにする
+            setBlock = nextSpawner.NextBlock();
+            setBlock.MakeRandomPeace();
+            activeBlock = spawner.SpawnBlock(setBlock);
+            //次のブロックを生成してブロックの中身をランダムにする
+            setBlock = nextSpawner.NextBlock();
+            setBlock.MakeRandomPeace();
         }
     }
-    //落ちてく処理
+    //動く処理
     private void Update()
     {
         PlayerInput();
@@ -98,8 +106,9 @@ public class GameManager : MonoBehaviour
         //座標を保存
         board.SaveBlockInGrid(activeBlock);
         // 次のブロックをスポーン
-        activeBlock = nextBlock;
-        nextBlock = spawner.SpawnBlock(); // 新しい次のブロックを生成
+        activeBlock = spawner.SpawnBlock(setBlock);
+        setBlock = nextSpawner.NextBlock(); // 新しい次のブロックを生成してブロックの中身をランダムにする
+        setBlock.MakeRandomPeace();
 
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
