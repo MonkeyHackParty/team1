@@ -384,3 +384,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31944448ba05d144fa216cd9021fcb0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canRotate: 1
