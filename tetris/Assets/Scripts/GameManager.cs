@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
                 activeBlock.MoveRight();
             }
         }
-        //回転
+        //右回転
         else if (Input.GetKey(KeyCode.E) && (Time.time > nextKeyRotatetimer) || Input.GetKeyDown(KeyCode.E))
         {
             activeBlock.RotateRight();

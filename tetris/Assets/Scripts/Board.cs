@@ -125,11 +125,13 @@ public class Board : MonoBehaviour
             }
         }
     }
+
+    //ブロックが上についてしまったか
     public bool OverLimit(Block block)
     {
-        foreach(Transform item in block.transform)
+        foreach (Transform item in block.transform)
         {
-            if(item.transform.position.y>=height -header)
+            if (item.transform.position.y >= height - header)
             {
                 return true;
             }
