@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3671100693763806626}
   - component: {fileID: 5493563531115634894}
+  - component: {fileID: 1411874261561444457}
   m_Layer: 0
   m_Name: tetrisblock (3)
   m_TagString: Untagged
@@ -84,6 +85,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1411874261561444457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195087416745767348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de9ab3e3b6903245b7e0740c7375271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockPeaces:
+  - {fileID: 6728980861082932898, guid: 0b9360fddef02a94bb1cffe3380c347b, type: 3}
+  - {fileID: -1536432373913079913, guid: fcd4460e874e882478428e3957f51e90, type: 3}
+  - {fileID: 6197866682045370365, guid: 56df69a04e4692f48af0ef07cd2ccaa7, type: 3}
+  - {fileID: 7912041790947262281, guid: b411fe20f55eb19428e129ab46da724a, type: 3}
 --- !u!1 &2122901872166595691
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,6 +112,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5461989539845928463}
   - component: {fileID: 2067607681524189938}
+  - component: {fileID: 2787185469457976837}
   m_Layer: 0
   m_Name: tetrisblock (1)
   m_TagString: Untagged
@@ -110,7 +129,7 @@ Transform:
   m_GameObject: {fileID: 2122901872166595691}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: -1, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -168,6 +187,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2787185469457976837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122901872166595691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de9ab3e3b6903245b7e0740c7375271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockPeaces:
+  - {fileID: 6728980861082932898, guid: 0b9360fddef02a94bb1cffe3380c347b, type: 3}
+  - {fileID: -1536432373913079913, guid: fcd4460e874e882478428e3957f51e90, type: 3}
+  - {fileID: 6197866682045370365, guid: 56df69a04e4692f48af0ef07cd2ccaa7, type: 3}
+  - {fileID: 7912041790947262281, guid: b411fe20f55eb19428e129ab46da724a, type: 3}
 --- !u!1 &2472668846944544000
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,6 +214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8580346726382580623}
   - component: {fileID: 3762211963230329275}
+  - component: {fileID: 8462376167736617138}
   m_Layer: 0
   m_Name: tetrisblock
   m_TagString: Untagged
@@ -252,6 +289,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8462376167736617138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2472668846944544000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de9ab3e3b6903245b7e0740c7375271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockPeaces:
+  - {fileID: 6728980861082932898, guid: 0b9360fddef02a94bb1cffe3380c347b, type: 3}
+  - {fileID: -1536432373913079913, guid: fcd4460e874e882478428e3957f51e90, type: 3}
+  - {fileID: 6197866682045370365, guid: 56df69a04e4692f48af0ef07cd2ccaa7, type: 3}
+  - {fileID: 7912041790947262281, guid: b411fe20f55eb19428e129ab46da724a, type: 3}
 --- !u!1 &5112878948848718881
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,6 +354,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31944448ba05d144fa216cd9021fcb0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canRotate: 1
+  peaceSpawns:
+  - {fileID: 8462376167736617138}
+  - {fileID: 2787185469457976837}
+  - {fileID: 8880187365456593847}
+  - {fileID: 1411874261561444457}
 --- !u!1 &9001036488281080163
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,6 +370,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1045614479060583980}
   - component: {fileID: 33949330765847561}
+  - component: {fileID: 8880187365456593847}
   m_Layer: 0
   m_Name: tetrisblock (2)
   m_TagString: Untagged
@@ -326,7 +387,7 @@ Transform:
   m_GameObject: {fileID: 9001036488281080163}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -384,3 +445,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8880187365456593847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9001036488281080163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de9ab3e3b6903245b7e0740c7375271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockPeaces:
+  - {fileID: 6728980861082932898, guid: 0b9360fddef02a94bb1cffe3380c347b, type: 3}
+  - {fileID: -1536432373913079913, guid: fcd4460e874e882478428e3957f51e90, type: 3}
+  - {fileID: 6197866682045370365, guid: 56df69a04e4692f48af0ef07cd2ccaa7, type: 3}
+  - {fileID: 7912041790947262281, guid: b411fe20f55eb19428e129ab46da724a, type: 3}
