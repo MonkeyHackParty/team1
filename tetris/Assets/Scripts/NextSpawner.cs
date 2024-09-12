@@ -6,19 +6,30 @@ public class NextSpawner : MonoBehaviour
 {
     //配列
     [SerializeField] Block[] Blocks;
+    private List<Block> availableBlocks;
 
-    //ランダムなブロックを返す
-    Block GetRandomBlock()
+    void Awake()
     {
-        int i = Random.Range(0, Blocks.Length);
-        if (Blocks[i])
+        ResetAvailableBlocks();
+    }
+
+    private void ResetAvailableBlocks()
+    {
+        availableBlocks = new List<Block>(Blocks);
+    }
+
+    public Block GetRandomBlock()
+    {
+        if (availableBlocks.Count == 0)
         {
-            return Blocks[i];
+            ResetAvailableBlocks();
         }
-        else
-        {
-            return null;
-        }
+
+        int index = Random.Range(0, availableBlocks.Count);
+        Block selectedBlock = availableBlocks[index];
+        availableBlocks.RemoveAt(index);
+
+        return selectedBlock;
     }
     //生成
     public Block NextBlock()
