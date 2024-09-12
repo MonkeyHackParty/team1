@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,12 +11,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float dropInterval = 0.25f;
     float nextdropTimer;
     Board board;
-
-    public void StartGame()
-    {
-        // ゲームのメインシーンをロードする
-        SceneManager.LoadScene("GameScene"); // "GameScene" には実際のゲームシーン名を入力
-    }
 
     float nextKeyDowntimer, nextKeyLeftRighttimer, nextKeyRotatetimer;
 
