@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 4754605207903126489}
   m_Layer: 0
   m_Name: Block_z
-  m_TagString: Untagged
+  m_TagString: Z
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

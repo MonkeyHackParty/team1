@@ -131,7 +131,7 @@ public class Board : MonoBehaviour
     {
         foreach (Transform item in block.transform)
         {
-            if (item.transform.position.y >= height - header)
+            if (item.transform.position.y+1 >= height - header)
             {
                 return true;
             }
