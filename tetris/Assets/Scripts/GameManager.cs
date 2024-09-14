@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     Spawner spawner;
     Block activeBlock;
+    Block ghostBlock;
     NextSpawner nextSpawner;
-    Block setBlock;
+
     Block holdBlock;
     Block saveBlock;
 
@@ -51,18 +51,21 @@ public class GameManager : MonoBehaviour
 
         if (!activeBlock)
         {
-            //初回のブロックを生成してブロックの中身をランダムにする
-            setBlock = nextSpawner.NextBlock();
-            setBlock.MakeRandomPeace();
-            activeBlock = spawner.SpawnBlock(setBlock);
-            //次のブロックを生成してブロックの中身をランダムにする
-            setBlock = nextSpawner.NextBlock();
-            setBlock.MakeRandomPeace();
+            activeBlock = GetNextBlock();
+            CreateGhostBlock();
         }
         if (gameOverPanel.activeInHierarchy)
         {
             gameOverPanel.SetActive(false);
         }
+    }
+
+    private Block GetNextBlock()
+    {
+        // 次のブロックを取得
+        Block nextBlock = nextSpawner.GetAndShiftNextBlock();
+        
+        return spawner.SpawnBlock(nextBlock);
     }
     //動く処理
     private void Update()
@@ -72,6 +75,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         PlayerInput();
+        UpdateGhostBlock();
 
     }
     void PlayerInput()
@@ -88,6 +92,8 @@ public class GameManager : MonoBehaviour
             {
                 activeBlock.MoveDown();
             }
+            //一個上げる
+            activeBlock.MoveUp();
             BottomBoard();
         }
         //右
@@ -149,9 +155,10 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    BottomBoard();
+                    //一個上げる
+                    activeBlock.MoveUp();
+                    Invoke("BottomBoard", 0.5f);
                 }
-
             }
         }
     }
@@ -553,14 +560,21 @@ public class GameManager : MonoBehaviour
     //底についたときの処理
     void BottomBoard()
     {
+        CancelInvoke();
+        while (board.CheckPosition(activeBlock))
+        {
+            activeBlock.MoveDown();
+        }
         //一個上げる
         activeBlock.MoveUp();
+
         //座標を保存
         board.SaveBlockInGrid(activeBlock);
         // 次のブロックをスポーン
-        activeBlock = spawner.SpawnBlock(setBlock);
-        setBlock = nextSpawner.NextBlock(); // 新しい次のブロックを生成してブロックの中身をランダムにする
-        setBlock.MakeRandomPeace();//中身をランダムに
+        activeBlock = GetNextBlock();
+        //ゴーストブロックの変更
+        Destroy(ghostBlock.gameObject);
+        CreateGhostBlock();
 
         holdcheck = true;
 
@@ -580,17 +594,23 @@ public class GameManager : MonoBehaviour
             if (holdBlock != null)
             {
                 activeBlock = spawner.SpawnBlock(holdBlock);
+                //ゴーストブロックの変更
+                Destroy(ghostBlock.gameObject);
+                CreateGhostBlock();
             }
             else
             {
-                activeBlock = spawner.SpawnBlock(setBlock);
-                setBlock = nextSpawner.NextBlock();
-                setBlock.MakeRandomPeace();
+                activeBlock = GetNextBlock();
+                //ゴーストブロックの変更
+                Destroy(ghostBlock.gameObject);
+                CreateGhostBlock();
+                
             }
             holdBlock = holdSpawner.HoldBlock(saveBlock);
             holdcheck = false;
         }
     }
+    //ゲームオーバー
     void GameOver()
     {
         activeBlock.MoveUp();
@@ -600,8 +620,64 @@ public class GameManager : MonoBehaviour
         }
         gameOver = true;
     }
+
+    //リトライ
     public void Restart()
     {
         SceneManager.LoadScene(0);
     }
+    // ゴーストブロックを作成
+    void CreateGhostBlock()
+    {
+        if (activeBlock != null)
+        {
+            ghostBlock = Instantiate(activeBlock, activeBlock.transform.position, activeBlock.transform.rotation);
+            // ゴーストブロックの色や透明度を変更
+            ChangeGhostAppearance();
+        }
+    }
+    // ゴーストブロックの外観を変更
+    // ゴーストブロックの外観を変更
+    void ChangeGhostAppearance()
+    {
+        foreach (Transform child in ghostBlock.transform)
+        {
+            SpriteRenderer renderer = child.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                // ゴーストブロックの透明度を設定
+                Color color = renderer.color;
+                color.a = 0f;  // 透明度を設定
+                renderer.color = color;
+
+                // ゴーストブロックの描画順を後ろに設定
+                renderer.sortingOrder = -1;  // アクティブブロックより低い値にする
+                                             // ゴーストブロックのすべての子オブジェクトからCanvasを持つものを取得して処理
+                foreach (Canvas childCanvas in ghostBlock.GetComponentsInChildren<Canvas>())
+                {
+                    childCanvas.sortingOrder = -1;
+                }
+            }
+        }
+    }
+    // ゴーストブロックをアップデート
+    void UpdateGhostBlock()
+    {
+        if (ghostBlock != null)
+        {
+            // ゴーストブロックをアクティブブロックと同じ位置に配置
+            ghostBlock.transform.position = activeBlock.transform.position;
+            ghostBlock.transform.rotation = activeBlock.transform.rotation;
+
+            // ゴーストブロックを落下させる
+            while (board.CheckPosition(ghostBlock))
+            {
+                ghostBlock.MoveDown();
+            }
+
+            // 1つ上に戻す（衝突する直前の位置にする）
+            ghostBlock.MoveUp();
+        }
+    }
 }
+
