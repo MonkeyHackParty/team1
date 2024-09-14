@@ -2,17 +2,16 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager Instance { get; private set; }
-    
+    public static ScoreManager Instance { get; private set; }  // シングルトン
+
     private int score = 0;
 
     private void Awake()
     {
-        // シングルトンのインスタンスを設定
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  // シーンを切り替えても保持する
+            DontDestroyOnLoad(gameObject);  // スコアを保持
         }
         else
         {
@@ -20,17 +19,16 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    // スコアを加算する
+    // スコアを加算するメソッド
     public void AddScore(int points)
     {
         score += points;
         Debug.Log("Score: " + score);
     }
 
-    // 現在のスコアを取得する
+    // スコアを取得するメソッド
     public int GetScore()
     {
         return score;
     }
 }
-

@@ -101,71 +101,62 @@ public class Board : MonoBehaviour
 
     // 隣接するブロックを確認して合体させる
     private void CheckAndMergeAdjacentBlocks(BlockPeace blockPeace, int x, int y, ref List<Transform> mergedBlocks)
+{
+    // グリッド外または空のセルであれば処理を終了
+    if (x < 0 || x >= width || y < 0 || y >= height || grid[x, y] == null)
     {
-        if (x >= 0 && x < width && y >= 0 && y < height && grid[x, y] != null)
-        {
-            BlockPeace adjacentBlockPeace = grid[x, y].GetComponent<BlockPeace>();
-            if (adjacentBlockPeace != null && blockPeace.GetNumber() == adjacentBlockPeace.GetNumber())
-            {
-                // 合体処理
-                MergeBlocks(blockPeace, adjacentBlockPeace, ref mergedBlocks);
-
-                // 数字が32になったら削除
-                if (blockPeace.GetNumber() == 32)
-                {
-                    Destroy(blockPeace.gameObject);
-                    Vector2 pos = Rounding.Round(blockPeace.transform.position);
-                    grid[(int)pos.x, (int)pos.y] = null;
-
-                   // グリッド調整後に重力を適用
-                    ApplyGravity();
-                }
-            }
-        }
+        return;
     }
+
+    BlockPeace adjacentBlockPeace = grid[x, y].GetComponent<BlockPeace>();
+
+    // adjacentBlockPeace が null でないことを確認し、数値が一致しているか確認
+    if (adjacentBlockPeace != null && blockPeace.GetNumber() == adjacentBlockPeace.GetNumber())
+    {
+        MergeBlocks(blockPeace, adjacentBlockPeace, ref mergedBlocks);  // 合体処理
+    }
+}
+
 
 
     // 合体処理
-    private void MergeBlocks(BlockPeace blockPeace, BlockPeace adjacentBlockPeace, ref List<Transform> mergedBlocks)
+   private void MergeBlocks(BlockPeace blockPeace, BlockPeace adjacentBlockPeace, ref List<Transform> mergedBlocks)
+{
+    if (blockPeace == null || adjacentBlockPeace == null)
     {
-        // 数値を倍にして新しいブロックを生成
-        int newNumber = blockPeace.GetNumber() * 2;
-        blockPeace.SetNumber(newNumber);  // 合体後のスプライトと数値を更新
+        Debug.LogError("blockPeace または adjacentBlockPeace が null です");
+        return;
+    }
 
-        // 合体された隣接ブロックのスプライトレンダラーを無効にする
-        SpriteRenderer adjacentRenderer = adjacentBlockPeace.GetComponent<SpriteRenderer>();
-        if (adjacentRenderer != null)
-        {
-            adjacentRenderer.enabled = false;  // スプライトレンダラーを無効化
-            Debug.Log($"スプライトレンダラーが無効になりました: {adjacentBlockPeace.name}");
-        }
+    // 数値を倍にして新しいブロックを生成
+    int newNumber = blockPeace.GetNumber() * 2;
+    blockPeace.SetNumber(newNumber);  // 数値を更新
 
-        // 合体されたブロック自体を削除する
-        Destroy(adjacentBlockPeace.gameObject);
-    
-        // グリッドから隣接ブロックの参照を削除
-        Vector2 adjacentPos = Rounding.Round(adjacentBlockPeace.transform.position);
-        grid[(int)adjacentPos.x, (int)adjacentPos.y] = null;
+    // adjacentBlockPeace を削除
+    Destroy(adjacentBlockPeace.gameObject);
 
-        // 合体後、数字が32になったら削除し、スコアを加算する
-        if (newNumber == 32)
-        {
-            Destroy(blockPeace.gameObject);
-            Vector2 pos = Rounding.Round(blockPeace.transform.position);
-            grid[(int)pos.x, (int)pos.y] = null;
+    // 合体済みリストに追加
+    mergedBlocks.Add(blockPeace.transform);
 
-           // スコア加算
-            ScoreManager.Instance.AddScore(100);  // 100点を加算
-        }
+    // 数字が32になったらブロックを削除し、スコアを加算
+    if (newNumber == 32)
+    {
+        Debug.Log($"ブロックが32になりました。削除してスコアを加算します。数値: {newNumber}");
 
-        // 重力を適用して上のブロックを落下させる
-        ApplyGravity();
+        // スコアを加算
+        ScoreManager.Instance.AddScore(100);  // 100点加算
 
-        // 合体済みリストに追加
-        mergedBlocks.Add(blockPeace.transform);
-
+        // blockPeaceの削除
+        Destroy(blockPeace.gameObject);
+    }
+    else
+    {
         Debug.Log($"合体されたブロック: {blockPeace.name} (新しい数値: {newNumber})");
     }
+}
+
+
+
 
 
 

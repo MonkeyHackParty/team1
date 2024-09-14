@@ -233,7 +233,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   number: 16
-  spriteRenderer: {fileID: 0}
+  prefabs:
+  - {fileID: 5088406864473193865, guid: 0b9360fddef02a94bb1cffe3380c347b, type: 3}
+  - {fileID: 8726832198151657991, guid: fcd4460e874e882478428e3957f51e90, type: 3}
+  - {fileID: 6227972484649402644, guid: 56df69a04e4692f48af0ef07cd2ccaa7, type: 3}
+  - {fileID: 4095179644543601063}
+  - {fileID: 359005735328322872, guid: 81b35c58210e38d4094e180079013b22, type: 3}
+  - {fileID: 8833930446060417118, guid: 2c768f6eb2eb6384587872c20b8203ef, type: 3}
 --- !u!1 &7168863275409427346
 GameObject:
   m_ObjectHideFlags: 0

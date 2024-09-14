@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class BlockPeace : MonoBehaviour
 {
-    [SerializeField] private int number;  // ブロックの数値（インスペクターから設定）
-    [SerializeField] private GameObject[] prefabs;  // Prefabsを格納する配列
+    [SerializeField] private int number;  // ブロックの数値（インスペクタから設定）
+    [SerializeField] private GameObject[] prefabs;  // プレハブを格納する配列
 
     private GameObject currentBlockInstance;  // 現在のPrefabインスタンスを保持
 
@@ -16,6 +16,13 @@ public class BlockPeace : MonoBehaviour
     // 数値に対応したPrefabを生成する処理
     private void UpdatePrefab()
     {
+        // 配列が空でないか確認
+        if (prefabs == null || prefabs.Length == 0)
+        {
+            Debug.LogError("prefabs 配列が初期化されていないか、サイズが 0 です");
+            return;
+        }
+
         // 数値が範囲内か確認
         if (number < 0 || number >= prefabs.Length)
         {
@@ -38,6 +45,7 @@ public class BlockPeace : MonoBehaviour
     public void SetNumber(int newNumber)
     {
         number = newNumber;  // 新しい数値を設定
+        Debug.Log($"数値が {newNumber} に設定されました");
         UpdatePrefab();  // 新しい数値に応じてPrefabを更新
     }
 
@@ -47,3 +55,5 @@ public class BlockPeace : MonoBehaviour
         return number;
     }
 }
+
+
