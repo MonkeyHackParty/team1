@@ -232,16 +232,8 @@ public class GameManager : MonoBehaviour
     // ゲームオーバー処理
     private void GameOver()
     {
-        isGameOver = true;
-        gameOverUI.SetActive(true);
+        isGameOver = true;  // ゲームオーバーフラグを立てる
+        SceneManager.LoadScene("GameOverScene");  // 新しいゲームオーバーシーンに遷移
         Debug.Log("Game Over!");
-    }
-
-    // リスタート処理
-    public void RestartGame()
-    {
-        gameOverUI.SetActive(false);
-        isGameOver = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

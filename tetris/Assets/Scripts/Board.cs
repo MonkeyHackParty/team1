@@ -101,32 +101,53 @@ public class Board : MonoBehaviour
             BlockPeace adjacentBlockPeace = grid[x, y].GetComponent<BlockPeace>();
             if (adjacentBlockPeace != null && blockPeace.GetNumber() == adjacentBlockPeace.GetNumber())
             {
-                // 合体処理
+                Debug.Log($"合体可能: {blockPeace.GetNumber()} と {adjacentBlockPeace.GetNumber()}");
                 MergeBlocks(blockPeace, adjacentBlockPeace, ref mergedBlocks);
             }
+        else
+            {
+                    Debug.Log($"合体不可: {blockPeace.GetNumber()} と {adjacentBlockPeace.GetNumber()}");
+            }
+
         }
     }
 
     // 合体処理
    private void MergeBlocks(BlockPeace blockPeace, BlockPeace adjacentBlockPeace, ref List<Transform> mergedBlocks)
 {
-    // 数値を倍にして更新
+    // 数値を倍にして新しいブロックを生成
     int newNumber = blockPeace.GetNumber() * 2;
-    blockPeace.SetNumber(newNumber);  // 合体後にスプライトと数値を更新
+    blockPeace.SetNumber(newNumber);
 
-    // 合体したブロックを削除
-    Destroy(adjacentBlockPeace.gameObject);
+    // 合体された隣接ブロックのスプライトレンダラーを無効にする
+    SpriteRenderer adjacentRenderer = adjacentBlockPeace.GetComponent<SpriteRenderer>();
+    if (adjacentRenderer != null)
+    {
+        adjacentRenderer.enabled = false;  // スプライトレンダラーを無効化
+        Debug.Log($"スプライトレンダラーが無効になりました: {adjacentBlockPeace.name}");
+    }
 
-    // デバッグログで確認
-    Debug.Log($"合体されたブロック: {blockPeace.name} (元の数値: {blockPeace.GetNumber() / 2}, 新しい数値: {newNumber})");
+    // 親オブジェクトを削除するか、ブロックそのものを削除する
+    if (adjacentBlockPeace.transform.parent != null)
+    {
+        Destroy(adjacentBlockPeace.transform.parent.gameObject);  // 親ごと削除
+    }
+    else
+    {
+        Destroy(adjacentBlockPeace.gameObject);  // 直接削除
+    }
 
-    // グリッドから削除処理も行う
+    // グリッドから隣接ブロックの参照を削除
     Vector2 adjacentPos = Rounding.Round(adjacentBlockPeace.transform.position);
     grid[(int)adjacentPos.x, (int)adjacentPos.y] = null;
 
     // 合体済みリストに追加
     mergedBlocks.Add(blockPeace.transform);
+
+    Debug.Log($"合体されたブロック: {blockPeace.name} (新しい数値: {newNumber})");
 }
+
+
 
     //消す処理
     //public void ClearAllRows()
