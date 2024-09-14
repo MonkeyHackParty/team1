@@ -12,6 +12,6 @@ public static class Rounding
     }
     public static Vector3 Round(Vector3 i)
     {
-        return new Vector3(Mathf.Round(i.x), Mathf.Round(i.y));
+        return new Vector3(Mathf.Round(i.x), Mathf.Round(i.y), Mathf.Round(i.z));
     }
 }

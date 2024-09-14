@@ -110,6 +110,11 @@ public class GameManager : MonoBehaviour
             return;  // ゲームオーバーなら次の処理をしない
         }
 
+        // 合体処理を呼び出し
+        board.CheckForMerge(activeBlock);
+
+
+
         // 次のブロックをスポーン
         activeBlock = spawner.SpawnBlock(setBlock);
         setBlock = nextSpawner.NextBlock();  // 新しい次のブロックを生成してブロックの中身をランダムにする
@@ -119,7 +124,7 @@ public class GameManager : MonoBehaviour
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
 
-        board.ClearAllRows();  // 行を削除する
+        //board.ClearAllRows();  // 行を削除する
     }
 
     // リスタート処理
