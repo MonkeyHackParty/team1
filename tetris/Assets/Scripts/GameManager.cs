@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 public class GameManager : MonoBehaviour
 {
     Spawner spawner;
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour
     {
         // 次のブロックを取得
         Block nextBlock = nextSpawner.GetAndShiftNextBlock();
-        
+
         return spawner.SpawnBlock(nextBlock);
     }
     //動く処理
@@ -92,9 +93,16 @@ public class GameManager : MonoBehaviour
             {
                 activeBlock.MoveDown();
             }
-            //一個上げる
-            activeBlock.MoveUp();
-            BottomBoard();
+            if (board.OverLimit(activeBlock))
+            {
+                GameOver();
+            }
+            else
+            {
+                //一個上げる
+                activeBlock.MoveUp();
+                BottomBoard();
+            }
         }
         //右
         else if (Input.GetKey(KeyCode.RightArrow) && (Time.time > nextKeyLeftRighttimer) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -572,6 +580,10 @@ public class GameManager : MonoBehaviour
         board.SaveBlockInGrid(activeBlock);
         // 次のブロックをスポーン
         activeBlock = GetNextBlock();
+        while (!board.CheckPosition(activeBlock))
+        {
+            activeBlock.MoveUp();
+        }
         //ゴーストブロックの変更
         Destroy(ghostBlock.gameObject);
         CreateGhostBlock();
@@ -604,7 +616,7 @@ public class GameManager : MonoBehaviour
                 //ゴーストブロックの変更
                 Destroy(ghostBlock.gameObject);
                 CreateGhostBlock();
-                
+
             }
             holdBlock = holdSpawner.HoldBlock(saveBlock);
             holdcheck = false;
