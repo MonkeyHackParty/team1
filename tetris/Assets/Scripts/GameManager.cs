@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
         if (!activeBlock)
         {
             activeBlock = GetNextBlock();
-            CreateGhostBlock();
+            //CreateGhostBlock();
         }
 
         if (gameOverPanel.activeInHierarchy)
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
         if (isGameOver) return;
 
         PlayerInput();
-        UpdateGhostBlock();
+        //UpdateGhostBlock();
     }
 
     void PlayerInput()
@@ -157,7 +157,7 @@ public class GameManager : MonoBehaviour
         board.CheckForMerge(activeBlock);
 
         activeBlock = GetNextBlock();
-        CreateGhostBlock();
+        //CreateGhostBlock();
 
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
@@ -181,53 +181,53 @@ public class GameManager : MonoBehaviour
             holdBlock = holdSpawner.HoldBlock(saveBlock);
             holdcheck = false;
 
-            Destroy(ghostBlock.gameObject);
-            CreateGhostBlock();
+            //Destroy(ghostBlock.gameObject);
+            //CreateGhostBlock();
         }
     }
 
     // ゴーストブロックを作成
-    void CreateGhostBlock()
-    {
-        if (activeBlock != null)
-        {
-            ghostBlock = Instantiate(activeBlock, activeBlock.transform.position, activeBlock.transform.rotation);
-            ChangeGhostAppearance();
-        }
-    }
+    //void CreateGhostBlock()
+    //{
+    //    if (activeBlock != null)
+    //    {
+    //        ghostBlock = Instantiate(activeBlock, activeBlock.transform.position, activeBlock.transform.rotation);
+    //        ChangeGhostAppearance();
+    //    }
+    //}
 
     // ゴーストブロックの外観を変更
-    void ChangeGhostAppearance()
-    {
-        foreach (Transform child in ghostBlock.transform)
-        {
-            SpriteRenderer renderer = child.GetComponent<SpriteRenderer>();
-            if (renderer != null)
-            {
-                Color color = renderer.color;
-                color.a = 0.2f;  // ゴーストブロックを半透明にする
-                renderer.color = color;
-                renderer.sortingOrder = -1;  // ゴーストブロックを背景に表示
-            }
-        }
-    }
+    //void ChangeGhostAppearance()
+    //{
+    //    foreach (Transform child in ghostBlock.transform)
+    //    {
+    //        SpriteRenderer renderer = child.GetComponent<SpriteRenderer>();
+    //        if (renderer != null)
+    //        {
+    //            Color color = renderer.color;
+    //            color.a = 0.2f;  // ゴーストブロックを半透明にする
+    //            renderer.color = color;
+    //            renderer.sortingOrder = -1;  // ゴーストブロックを背景に表示
+    //        }
+    //    }
+    //}
 
     // ゴーストブロックを更新
-    void UpdateGhostBlock()
-    {
-        if (ghostBlock != null)
-        {
-            ghostBlock.transform.position = activeBlock.transform.position;
-            ghostBlock.transform.rotation = activeBlock.transform.rotation;
+    //void UpdateGhostBlock()
+    //{
+    //    if (ghostBlock != null)
+    //    {
+    //        ghostBlock.transform.position = activeBlock.transform.position;
+    //        ghostBlock.transform.rotation = activeBlock.transform.rotation;
 
-            while (board.CheckPosition(ghostBlock))
-            {
-                ghostBlock.MoveDown();
-            }
+    //        while (board.CheckPosition(ghostBlock))
+    //        {
+    //            ghostBlock.MoveDown();
+    //        }
 
-            ghostBlock.MoveUp();
-        }
-    }
+    //        ghostBlock.MoveUp();
+    //    }
+    //}
 
     // ゲームオーバー処理
     private void GameOver()
