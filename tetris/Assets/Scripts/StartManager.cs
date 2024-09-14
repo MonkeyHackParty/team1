@@ -5,6 +5,6 @@ public class StartManager : MonoBehaviour
 {
     public void StartGame()
     {
-        SceneManager.LoadScene("sampleScene"); // タイトルからゲーム画面へ
+        SceneManager.LoadScene("SampleScene"); // タイトルからゲーム画面へ
     }
 }

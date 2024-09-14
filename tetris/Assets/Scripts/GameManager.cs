@@ -1,18 +1,23 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;  // シーン遷移用
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     Spawner spawner;
     Block activeBlock;
+    Block ghostBlock;
     NextSpawner nextSpawner;
-    Block setBlock;
+
+    Block holdBlock;
+    Block saveBlock;
 
     [SerializeField] private float dropInterval = 0.25f;
     float nextdropTimer;
     Board board;
+    HoldSpawner holdSpawner;
+
+    private bool holdcheck = true;
 
     [SerializeField] private GameObject gameOverUI;  // ゲームオーバー画面のUI
     private bool isGameOver = false;  // ゲームオーバー状態を管理するフラグ
@@ -20,11 +25,14 @@ public class GameManager : MonoBehaviour
     float nextKeyDowntimer, nextKeyLeftRighttimer, nextKeyRotatetimer;
     [SerializeField] private float nextKeyDownInterval, nextKeyLeftRightInterval, nextKeyRotateInterval;
 
+    [SerializeField] private GameObject gameOverPanel;
+
     private void Start()
     {
-        spawner = GameObject.FindObjectOfType<Spawner>();
-        board = GameObject.FindObjectOfType<Board>();
-        nextSpawner = GameObject.FindObjectOfType<NextSpawner>();
+        spawner = FindObjectOfType<Spawner>();
+        board = FindObjectOfType<Board>();
+        nextSpawner = FindObjectOfType<NextSpawner>();
+        holdSpawner = FindObjectOfType<HoldSpawner>();
 
         // スポナーの位置をきれいにする
         spawner.transform.position = Rounding.Round(spawner.transform.position);
@@ -35,30 +43,57 @@ public class GameManager : MonoBehaviour
 
         if (!activeBlock)
         {
-            // 初回のブロック生成
-            setBlock = nextSpawner.NextBlock();
-            setBlock.MakeRandomPeace();
-            activeBlock = spawner.SpawnBlock(setBlock);
-
-            // 次のブロック生成
-            setBlock = nextSpawner.NextBlock();
-            setBlock.MakeRandomPeace();
+            activeBlock = GetNextBlock();
+            CreateGhostBlock();
         }
+
+        if (gameOverPanel.activeInHierarchy)
+        {
+            gameOverPanel.SetActive(false);
+        }
+    }
+
+    private Block GetNextBlock()
+    {
+        // 次のブロックを取得してスポーン
+        Block nextBlock = nextSpawner.GetAndShiftNextBlock();
+        return spawner.SpawnBlock(nextBlock);
     }
 
     private void Update()
     {
-        if (isGameOver)
-        {
-            return;  // ゲームオーバー時は操作を無効化
-        }
+        if (isGameOver) return;
 
         PlayerInput();
+        UpdateGhostBlock();
     }
 
     void PlayerInput()
     {
-        if (Input.GetKey(KeyCode.D) && (Time.time > nextKeyLeftRighttimer) || Input.GetKeyDown(KeyCode.D))
+        // ホールド機能
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Hold();
+        }
+        // ハードドロップ
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            while (board.CheckPosition(activeBlock))
+            {
+                activeBlock.MoveDown();
+            }
+            if (board.OverLimit(activeBlock))
+            {
+                GameOver();
+            }
+            else
+            {
+                activeBlock.MoveUp();
+                BottomBoard();
+            }
+        }
+        // 右移動
+        else if (Input.GetKey(KeyCode.RightArrow) && Time.time > nextKeyLeftRighttimer || Input.GetKeyDown(KeyCode.RightArrow))
         {
             activeBlock.MoveRight();
             nextKeyLeftRighttimer = Time.time + nextKeyLeftRightInterval;
@@ -67,7 +102,8 @@ public class GameManager : MonoBehaviour
                 activeBlock.MoveLeft();
             }
         }
-        else if (Input.GetKey(KeyCode.A) && (Time.time > nextKeyLeftRighttimer) || Input.GetKeyDown(KeyCode.A))
+        // 左移動
+        else if (Input.GetKey(KeyCode.LeftArrow) && Time.time > nextKeyLeftRighttimer || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             activeBlock.MoveLeft();
             nextKeyLeftRighttimer = Time.time + nextKeyLeftRightInterval;
@@ -76,7 +112,8 @@ public class GameManager : MonoBehaviour
                 activeBlock.MoveRight();
             }
         }
-        else if (Input.GetKey(KeyCode.E) && (Time.time > nextKeyRotatetimer) || Input.GetKeyDown(KeyCode.E))
+        // 回転
+        else if (Input.GetKey(KeyCode.UpArrow) && Time.time > nextKeyRotatetimer || Input.GetKeyDown(KeyCode.UpArrow))
         {
             activeBlock.RotateRight();
             nextKeyRotatetimer = Time.time + nextKeyRotateInterval;
@@ -85,62 +122,126 @@ public class GameManager : MonoBehaviour
                 activeBlock.RotateLeft();
             }
         }
-        else if (Input.GetKey(KeyCode.S) && (Time.time > nextKeyDowntimer) || Time.time > nextdropTimer)
+        // 下加速
+        else if (Input.GetKey(KeyCode.DownArrow) && Time.time > nextKeyDowntimer || Time.time > nextdropTimer)
         {
             activeBlock.MoveDown();
             nextKeyDowntimer = Time.time + nextKeyDownInterval;
             nextdropTimer = Time.time + dropInterval;
             if (!board.CheckPosition(activeBlock))
             {
-                BottomBoard();
+                if (board.OverLimit(activeBlock))
+                {
+                    GameOver();
+                }
+                else
+                {
+                    activeBlock.MoveUp();
+                    BottomBoard();
+                }
             }
         }
     }
 
-    // 底についたときの処理
+    // ブロックが着地したときの処理
     void BottomBoard()
     {
-        activeBlock.MoveUp();  // 一個上げる
-        board.SaveBlockInGrid(activeBlock);  // 座標を保存
+        board.SaveBlockInGrid(activeBlock);
 
-        // ゲームオーバー判定
         if (board.OverLimit(activeBlock))
         {
             GameOver();
-            return;  // ゲームオーバーなら次の処理をしない
+            return;
         }
 
-        // 合体処理を呼び出し
         board.CheckForMerge(activeBlock);
 
-
-
-        // 次のブロックをスポーン
-        activeBlock = spawner.SpawnBlock(setBlock);
-        setBlock = nextSpawner.NextBlock();  // 新しい次のブロックを生成してブロックの中身をランダムにする
-        setBlock.MakeRandomPeace();
+        activeBlock = GetNextBlock();
+        CreateGhostBlock();
 
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
-
-        //board.ClearAllRows();  // 行を削除する
     }
 
-    // リスタート処理
-    public void RestartGame()
+    // ホールド機能
+    void Hold()
     {
-        gameOverUI.SetActive(false);  // ゲームオーバーUIを非表示
-        isGameOver = false;  // ゲームオーバーフラグをリセット
+        if (holdcheck)
+        {
+            saveBlock = activeBlock;
+            if (holdBlock != null)
+            {
+                activeBlock = spawner.SpawnBlock(holdBlock);
+            }
+            else
+            {
+                activeBlock = GetNextBlock();
+            }
+            holdBlock = holdSpawner.HoldBlock(saveBlock);
+            holdcheck = false;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);  // 現在のシーンを再読み込みしてリスタート
+            Destroy(ghostBlock.gameObject);
+            CreateGhostBlock();
+        }
+    }
+
+    // ゴーストブロックを作成
+    void CreateGhostBlock()
+    {
+        if (activeBlock != null)
+        {
+            ghostBlock = Instantiate(activeBlock, activeBlock.transform.position, activeBlock.transform.rotation);
+            ChangeGhostAppearance();
+        }
+    }
+
+    // ゴーストブロックの外観を変更
+    void ChangeGhostAppearance()
+    {
+        foreach (Transform child in ghostBlock.transform)
+        {
+            SpriteRenderer renderer = child.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                Color color = renderer.color;
+                color.a = 0.2f;  // ゴーストブロックを半透明にする
+                renderer.color = color;
+                renderer.sortingOrder = -1;  // ゴーストブロックを背景に表示
+            }
+        }
+    }
+
+    // ゴーストブロックを更新
+    void UpdateGhostBlock()
+    {
+        if (ghostBlock != null)
+        {
+            ghostBlock.transform.position = activeBlock.transform.position;
+            ghostBlock.transform.rotation = activeBlock.transform.rotation;
+
+            while (board.CheckPosition(ghostBlock))
+            {
+                ghostBlock.MoveDown();
+            }
+
+            ghostBlock.MoveUp();
+        }
     }
 
     // ゲームオーバー処理
     private void GameOver()
     {
-        isGameOver = true;  // ゲームオーバーフラグを立てる
-        SceneManager.LoadScene("GameOverScene");  // 新しいゲームオーバーシーンに遷移
+        isGameOver = true;
+        gameOverUI.SetActive(true);
         Debug.Log("Game Over!");
+    }
+
+    // リスタート処理
+    public void RestartGame()
+    {
+        gameOverUI.SetActive(false);
+        isGameOver = false;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
