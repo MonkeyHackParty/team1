@@ -144,6 +144,7 @@ public class GameManager : MonoBehaviour
     }
 
     // ブロックが着地したときの処理
+
     void BottomBoard()
     {
         board.SaveBlockInGrid(activeBlock);
@@ -163,6 +164,7 @@ public class GameManager : MonoBehaviour
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
     }
+
 
     // ホールド機能
     void Hold()
@@ -185,6 +187,7 @@ public class GameManager : MonoBehaviour
             //CreateGhostBlock();
         }
     }
+
 
     // ゴーストブロックを作成
     //void CreateGhostBlock()
