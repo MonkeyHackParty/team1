@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager Instance { get; private set; }  // シングルトン
+    public static ScoreManager Instance { get; private set; }
 
     private int score = 0;
 
@@ -11,11 +11,13 @@ public class ScoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  // スコアを保持
+            DontDestroyOnLoad(gameObject);  // シーンを跨いでもスコアを保持
+            Debug.Log("ScoreManager が初期化されました。");
         }
         else
         {
-            Destroy(gameObject);
+            Debug.LogError("複数の ScoreManager が存在します。");
+            Destroy(gameObject);  // 複数存在する場合は新しいものを削除
         }
     }
 
@@ -23,10 +25,10 @@ public class ScoreManager : MonoBehaviour
     public void AddScore(int points)
     {
         score += points;
-        Debug.Log("Score: " + score);
+        Debug.Log("スコアが加算されました。現在のスコア: " + score);
     }
 
-    // スコアを取得するメソッド
+    // 現在のスコアを取得するメソッド
     public int GetScore()
     {
         return score;

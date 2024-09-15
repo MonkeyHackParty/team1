@@ -102,7 +102,7 @@ public class Board : MonoBehaviour
     // 隣接するブロックを確認して合体させる
     private void CheckAndMergeAdjacentBlocks(BlockPeace blockPeace, int x, int y, ref List<Transform> mergedBlocks)
 {
-    // グリッド外または空のセルであれば処理を終了
+    // グリッド外または空のセルを処理しない
     if (x < 0 || x >= width || y < 0 || y >= height || grid[x, y] == null)
     {
         return;
@@ -110,50 +110,62 @@ public class Board : MonoBehaviour
 
     BlockPeace adjacentBlockPeace = grid[x, y].GetComponent<BlockPeace>();
 
-    // adjacentBlockPeace が null でないことを確認し、数値が一致しているか確認
+    // adjacentBlockPeace が null でないことを確認し、数値が一致しているかを確認
     if (adjacentBlockPeace != null && blockPeace.GetNumber() == adjacentBlockPeace.GetNumber())
     {
         MergeBlocks(blockPeace, adjacentBlockPeace, ref mergedBlocks);  // 合体処理
     }
+    else
+    {
+        Debug.Log("隣接するブロックが null か数値が一致していないため、合体しませんでした");
+    }
 }
+
 
 
 
     // 合体処理
    private void MergeBlocks(BlockPeace blockPeace, BlockPeace adjacentBlockPeace, ref List<Transform> mergedBlocks)
 {
-    if (blockPeace == null || adjacentBlockPeace == null)
+    if (blockPeace == null)
     {
-        Debug.LogError("blockPeace または adjacentBlockPeace が null です");
+        Debug.LogError("MergeBlocks: blockPeace が null です");
+        return;
+    }
+    if (adjacentBlockPeace == null)
+    {
+        Debug.LogError("MergeBlocks: adjacentBlockPeace が null です");
         return;
     }
 
-    // 数値を倍にして新しいブロックを生成
     int newNumber = blockPeace.GetNumber() * 2;
-    blockPeace.SetNumber(newNumber);  // 数値を更新
+    blockPeace.SetNumber(newNumber);
 
-    // adjacentBlockPeace を削除
     Destroy(adjacentBlockPeace.gameObject);
-
-    // 合体済みリストに追加
     mergedBlocks.Add(blockPeace.transform);
 
-    // 数字が32になったらブロックを削除し、スコアを加算
     if (newNumber == 32)
+{
+    Debug.Log("32に達したブロックが削除されます。");
+
+    // blockPeaceの削除
+    Destroy(blockPeace.gameObject);
+
+    // スコアを加算
+    if (ScoreManager.Instance != null)
     {
-        Debug.Log($"ブロックが32になりました。削除してスコアを加算します。数値: {newNumber}");
-
-        // スコアを加算
-        ScoreManager.Instance.AddScore(100);  // 100点加算
-
-        // blockPeaceの削除
-        Destroy(blockPeace.gameObject);
+        ScoreManager.Instance.AddScore(100);
+        Debug.Log("スコアが100点加算されました。現在のスコア: " + ScoreManager.Instance.GetScore());
     }
     else
     {
-        Debug.Log($"合体されたブロック: {blockPeace.name} (新しい数値: {newNumber})");
+        Debug.LogError("ScoreManager.Instance が null です。スコア加算が行われませんでした。");
     }
 }
+
+}
+
+
 
 
 
