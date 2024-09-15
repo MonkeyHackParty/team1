@@ -149,11 +149,11 @@ public class Board : MonoBehaviour
         // スコアを加算
         ScoreManager.Instance.AddScore(100);  // 100点加算
     }
+
+    ApplyGravity();
 }
 
-
-
-    private void ApplyGravity()
+private void ApplyGravity()
     {
         for (int x = 0; x < width; x++)
         {
@@ -176,6 +176,8 @@ public class Board : MonoBehaviour
             }
         }
     }
+
+    
 
     //消す処理
     //public void ClearAllRows()
