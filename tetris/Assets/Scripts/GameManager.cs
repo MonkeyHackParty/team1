@@ -237,6 +237,5 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;  // ゲームオーバーフラグを立てる
         SceneManager.LoadScene("GameOverScene");  // 新しいゲームオーバーシーンに遷移
-        Debug.Log("Game Over!");
     }
 }

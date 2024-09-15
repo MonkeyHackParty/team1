@@ -99,7 +99,6 @@ public class Board : MonoBehaviour
         }
     }
 
-    // 隣接するブロックを確認して合体させる
     private void CheckAndMergeAdjacentBlocks(BlockPeace blockPeace, int x, int y, ref List<Transform> mergedBlocks)
 {
     // グリッド外または空のセルを処理しない
@@ -115,11 +114,8 @@ public class Board : MonoBehaviour
     {
         MergeBlocks(blockPeace, adjacentBlockPeace, ref mergedBlocks);  // 合体処理
     }
-    else
-    {
-        Debug.Log("隣接するブロックが null か数値が一致していないため、合体しませんでした");
-    }
 }
+
 
 
 
@@ -127,48 +123,33 @@ public class Board : MonoBehaviour
     // 合体処理
    private void MergeBlocks(BlockPeace blockPeace, BlockPeace adjacentBlockPeace, ref List<Transform> mergedBlocks)
 {
-    if (blockPeace == null)
+    // blockPeace または adjacentBlockPeace が null でないことを確認
+    if (blockPeace == null || adjacentBlockPeace == null)
     {
-        Debug.LogError("MergeBlocks: blockPeace が null です");
-        return;
-    }
-    if (adjacentBlockPeace == null)
-    {
-        Debug.LogError("MergeBlocks: adjacentBlockPeace が null です");
         return;
     }
 
+    // 数値を倍にして新しいブロックを生成
     int newNumber = blockPeace.GetNumber() * 2;
-    blockPeace.SetNumber(newNumber);
+    blockPeace.SetNumber(newNumber);  // 新しい数値を設定
 
+    // adjacentBlockPeace を削除
     Destroy(adjacentBlockPeace.gameObject);
+
+    // 合体済みリストに追加
     mergedBlocks.Add(blockPeace.transform);
 
+    // 数字が32になったらブロックを削除し、スコアを加算
     if (newNumber == 32)
-{
-    Debug.Log("32に達したブロックが削除されます。");
-
-    // blockPeaceの削除
-    Destroy(blockPeace.gameObject);
-
-    // スコアを加算
-    if (ScoreManager.Instance != null)
     {
-        ScoreManager.Instance.AddScore(100);
-        Debug.Log("スコアが100点加算されました。現在のスコア: " + ScoreManager.Instance.GetScore());
-    }
-    else
-    {
-        Debug.LogError("ScoreManager.Instance が null です。スコア加算が行われませんでした。");
+
+        // blockPeaceの削除
+        Destroy(blockPeace.gameObject);
+
+        // スコアを加算
+        ScoreManager.Instance.AddScore(100);  // 100点加算
     }
 }
-
-}
-
-
-
-
-
 
 
 

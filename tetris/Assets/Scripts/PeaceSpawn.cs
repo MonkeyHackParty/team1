@@ -13,7 +13,6 @@ public class PeaceSpawn : MonoBehaviour
         // BlockPeaces 配列のインデックスが 0 ～ 3 までの範囲内であることを確認
         if (BlockPeaces.Length < 4)
         {
-            Debug.LogError("BlockPeaces配列に正しくプレハブが設定されていません。2, 4, 8, 16 の4つのプレハブを設定してください。");
             return null;
         }
 
@@ -27,11 +26,6 @@ public class PeaceSpawn : MonoBehaviour
     public void SpawnBlockPeace()
     {
         BlockPeace blockPeaceInstance = Instantiate(GetRandomBlockPeace(), transform.position, Quaternion.identity, transform.parent);
-
-        if (blockPeaceInstance != null)
-        {
-            Debug.Log($"生成されたブロック: {blockPeaceInstance.name}");
-        }
 
         Destroy(gameObject);  // スパナーを削除
     }

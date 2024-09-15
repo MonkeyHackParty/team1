@@ -10,10 +10,6 @@ public class StartManager : MonoBehaviour
         {
             SoundManager.Instance.PlayStartSound(); // StartSoundを再生
         }
-        else
-        {
-            Debug.LogError("SoundManager Instance が null です。SoundManager がシーンに存在するか確認してください。");
-        }
     }
 
     public void StartGame()

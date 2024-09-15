@@ -27,7 +27,6 @@ public class SoundManager : MonoBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject); // シーンを跨いでもオブジェクトを保持
-        Debug.Log("SoundManager Instance が初期化されました");
     }
     else
     {
@@ -49,10 +48,6 @@ public class SoundManager : MonoBehaviour
             oneTimeAudioSource.clip = startSoundClip;
             oneTimeAudioSource.Play();
         }
-        else
-        {
-            Debug.LogWarning("start.wavが見つかりません");
-        }
     }
 
     // BGMを再生する（ループ再生対応）
@@ -65,10 +60,6 @@ public class SoundManager : MonoBehaviour
             datavolume = data.volume;
             bgmAudioSource.loop = loop;  // ループ設定
             bgmAudioSource.Play();
-        }
-        else
-        {
-            Debug.LogWarning("指定されたBGMが見つかりません: " + bgm);
         }
     }
 
@@ -92,10 +83,7 @@ public class SoundManager : MonoBehaviour
             // 再生終了後にAudioSourceを削除
             Destroy(newSeAudioSource, data.audioClip.length);
         }
-        else
-        {
-            Debug.LogWarning("指定されたSEが見つかりません: " + se);
-        }
+
     }
 
     // SEを停止する

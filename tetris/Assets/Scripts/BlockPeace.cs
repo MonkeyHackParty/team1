@@ -15,37 +15,40 @@ public class BlockPeace : MonoBehaviour
 
     // 数値に対応したPrefabを生成する処理
     private void UpdatePrefab()
+{
+    // 配列が正しく設定されているか確認
+    if (prefabs == null || prefabs.Length == 0)
     {
-        // 配列が空でないか確認
-        if (prefabs == null || prefabs.Length == 0)
-        {
-            Debug.LogError("prefabs 配列が初期化されていないか、サイズが 0 です");
-            return;
-        }
-
-        // 数値が範囲内か確認
-        if (number < 0 || number >= prefabs.Length)
-        {
-            Debug.LogError($"指定された数値 {number} に対応するPrefabが存在しません。Prefab配列のサイズ: {prefabs.Length}");
-            return;
-        }
-
-        // 既に表示されているPrefabがあれば削除
-        if (currentBlockInstance != null)
-        {
-            Destroy(currentBlockInstance);  // 既存のPrefabを削除
-        }
-
-        // 数値に対応するPrefabを生成
-        currentBlockInstance = Instantiate(prefabs[number], transform.position, Quaternion.identity, transform);
-        Debug.Log($"Prefab {prefabs[number].name} が生成されました。数値: {number}");
+        return;
     }
+
+    // 数値が範囲内か確認
+    if (number < 0 || number >= prefabs.Length)
+    {
+        return;
+    }
+
+    // Prefabがnullでないか確認
+    if (prefabs[number / 2] == null)
+    {
+        return;
+    }
+
+    // 既に表示されているPrefabがあれば削除
+    if (currentBlockInstance != null)
+    {
+        Destroy(currentBlockInstance);  // 既存のPrefabを削除
+    }
+
+    // 数値に対応するPrefabを生成
+    currentBlockInstance = Instantiate(prefabs[number / 2], transform.position, Quaternion.identity, transform);
+}
+
 
     // 数値を設定するメソッド
     public void SetNumber(int newNumber)
     {
         number = newNumber;  // 新しい数値を設定
-        Debug.Log($"数値が {newNumber} に設定されました");
         UpdatePrefab();  // 新しい数値に応じてPrefabを更新
     }
 
