@@ -23,6 +23,5 @@ public class PeaceSpawn : MonoBehaviour
         Transform parentTransform = transform.parent;
         Instantiate(GetRandomBlockPeace(), transform.position, Quaternion.identity, parentTransform);
         Destroy(gameObject);
-        
     }
 }

@@ -84,6 +84,4 @@ public class NextSpawner : MonoBehaviour
 
         return nextBlock;
     }
-
-
 }

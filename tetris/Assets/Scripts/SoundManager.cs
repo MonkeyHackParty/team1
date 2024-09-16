@@ -30,6 +30,7 @@ public class SoundManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     void Update()
     {
         bgmAudioSource.volume = datavolume*bgmMasterVolume * masterVolume;
@@ -42,7 +43,6 @@ public class SoundManager : MonoBehaviour
         datavolume = data.volume;
         bgmAudioSource.Play();
     }
-
 
     public void PlaySE(SESoundData.SE se)
     {
