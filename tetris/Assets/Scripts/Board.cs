@@ -33,7 +33,7 @@ public class Board : MonoBehaviour
         }
     }
     //はみ出てないかのチェック
-    public bool CheckPosition(Block block)
+    public bool IsWithinPosition(Block block)
     {
         foreach (Transform item in block.transform)
         {

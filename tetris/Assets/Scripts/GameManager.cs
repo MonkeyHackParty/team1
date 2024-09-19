@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     Block saveBlock;
 
     [SerializeField] private float dropInterval = 0.25f;
-    float nextdropTimer;
+    float nextdropTimer = 0.25f;
     Board board;
     HoldSpawner holdSpawner;
 
@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     bool gameOver;
     float beforerotationZ;
     float afterrotationZ;
+    float setuplimit=0f;
+    bool setup = false;
 
     private void Start()
     {
@@ -89,7 +91,7 @@ public class GameManager : MonoBehaviour
         //ハードドロップ
         else if (Input.GetKeyDown(KeyCode.Space))
         {
-            while (board.CheckPosition(activeBlock))
+            while (board.IsWithinPosition(activeBlock))
             {
                 activeBlock.MoveDown();
             }
@@ -110,7 +112,7 @@ public class GameManager : MonoBehaviour
             activeBlock.MoveRight();
 
             nextKeyLeftRighttimer = Time.time + nextKeyLeftRightInterval;
-            if (!board.CheckPosition(activeBlock))
+            if (!board.IsWithinPosition(activeBlock))
             {
                 activeBlock.MoveLeft();
             }
@@ -121,7 +123,7 @@ public class GameManager : MonoBehaviour
             activeBlock.MoveLeft();
 
             nextKeyLeftRighttimer = Time.time + nextKeyLeftRightInterval;
-            if (!board.CheckPosition(activeBlock))
+            if (!board.IsWithinPosition(activeBlock))
             {
                 activeBlock.MoveRight();
             }
@@ -132,7 +134,7 @@ public class GameManager : MonoBehaviour
             beforerotationZ = activeBlock.transform.eulerAngles.z;
             activeBlock.RotateRight();
             nextKeyRotatetimer = Time.time + nextKeyRotateInterval;
-            if (!board.CheckPosition(activeBlock))
+            if (!board.IsWithinPosition(activeBlock))
             {
                 TryRotateLeftRight(activeBlock, 1);
             }
@@ -143,29 +145,45 @@ public class GameManager : MonoBehaviour
             beforerotationZ = activeBlock.transform.eulerAngles.z;
             activeBlock.RotateLeft();
             nextKeyRotatetimer = Time.time + nextKeyRotateInterval;
-            if (!board.CheckPosition(activeBlock))
+            if (!board.IsWithinPosition(activeBlock))
             {
                 TryRotateLeftRight(activeBlock, 2);
             }
         }
         //下加速
-        else if (Input.GetKey(KeyCode.DownArrow) && (Time.time > nextKeyDowntimer) || Time.time > nextdropTimer)
+        else
         {
             activeBlock.MoveDown();
-
-            nextKeyDowntimer = Time.time + nextKeyDownInterval;
-            nextdropTimer = Time.time + dropInterval;
-            if (!board.CheckPosition(activeBlock))
+            if (!board.IsWithinPosition(activeBlock))
             {
-                if (board.OverLimit(activeBlock))
+                setuplimit += Time.deltaTime;
+                if (setuplimit >= 1f)
                 {
-                    GameOver();
+                    setup = true;
                 }
-                else
+            }
+            activeBlock.MoveUp();
+            if (Input.GetKey(KeyCode.DownArrow) && (Time.time > nextKeyDowntimer) || Time.time > nextdropTimer)
+            {
+                activeBlock.MoveDown();
+
+                nextKeyDowntimer = Time.time + nextKeyDownInterval;
+                nextdropTimer = Time.time + dropInterval;
+                if (!board.IsWithinPosition(activeBlock))
                 {
-                    //一個上げる
-                    activeBlock.MoveUp();
-                    Invoke("BottomBoard", 0.5f);
+                    if (board.OverLimit(activeBlock))
+                    {
+                        GameOver();
+                    }
+                    else
+                    {
+                        //一個上げる
+                        activeBlock.MoveUp();
+                        if (setup)
+                        {
+                            BottomBoard();
+                        }
+                    }
                 }
             }
         }
@@ -263,7 +281,7 @@ public class GameManager : MonoBehaviour
             }
 
 
-            if (!board.CheckPosition(block))
+            if (!board.IsWithinPosition(block))
             {
                 switch (afterrotationZ)
                 {
@@ -339,7 +357,7 @@ public class GameManager : MonoBehaviour
                         break;
 
                 }
-                if (!board.CheckPosition(block))
+                if (!board.IsWithinPosition(block))
                 {
                     switch (afterrotationZ)
                     {
@@ -386,7 +404,7 @@ public class GameManager : MonoBehaviour
                     }
 
 
-                    if (!board.CheckPosition(block))
+                    if (!board.IsWithinPosition(block))
                     {
                         switch (afterrotationZ)
                         {
@@ -431,7 +449,7 @@ public class GameManager : MonoBehaviour
                                 }
                                 break;
                         }
-                        if (!board.CheckPosition(block))
+                        if (!board.IsWithinPosition(block))
                         {
                             block.transform.position = savePosition;
                             switch (rotate)
@@ -477,7 +495,7 @@ public class GameManager : MonoBehaviour
                     }
                     break;
             }
-            if (!board.CheckPosition(block))
+            if (!board.IsWithinPosition(block))
             {
                 switch (afterrotationZ)
                 {
@@ -494,7 +512,7 @@ public class GameManager : MonoBehaviour
                         block.MoveDown();
                         break;
                 }
-                if (!board.CheckPosition(block))
+                if (!board.IsWithinPosition(block))
                 {
                     block.transform.position = savePosition;
                     switch (afterrotationZ)
@@ -518,7 +536,7 @@ public class GameManager : MonoBehaviour
                             }
                             break;
                     }
-                    if (!board.CheckPosition(block))
+                    if (!board.IsWithinPosition(block))
                     {
                         switch (afterrotationZ)
                         {
@@ -547,7 +565,7 @@ public class GameManager : MonoBehaviour
                                 }
                                 break;
                         }
-                        if (!board.CheckPosition(block))
+                        if (!board.IsWithinPosition(block))
                         {
                             block.transform.position = savePosition;
                             switch (rotate)
@@ -569,7 +587,7 @@ public class GameManager : MonoBehaviour
     void BottomBoard()
     {
         CancelInvoke();
-        while (board.CheckPosition(activeBlock))
+        while (board.IsWithinPosition(activeBlock))
         {
             activeBlock.MoveDown();
         }
@@ -580,7 +598,7 @@ public class GameManager : MonoBehaviour
         board.SaveBlockInGrid(activeBlock);
         // 次のブロックをスポーン
         activeBlock = GetNextBlock();
-        while (!board.CheckPosition(activeBlock))
+        while (!board.IsWithinPosition(activeBlock))
         {
             activeBlock.MoveUp();
         }
@@ -590,9 +608,12 @@ public class GameManager : MonoBehaviour
 
         holdcheck = true;
 
+        setup = false;
+        setuplimit=0f;
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
+        nextdropTimer = Time.time + dropInterval;
 
         //削除
         board.ClearAllRows();
@@ -682,7 +703,7 @@ public class GameManager : MonoBehaviour
             ghostBlock.transform.rotation = activeBlock.transform.rotation;
 
             // ゴーストブロックを落下させる
-            while (board.CheckPosition(ghostBlock))
+            while (board.IsWithinPosition(ghostBlock))
             {
                 ghostBlock.MoveDown();
             }
