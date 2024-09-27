@@ -37,14 +37,14 @@ public class Block : MonoBehaviour
     {
         if (canRotate)
         {
-            transform.Rotate(0, 0, 90);
+            transform.Rotate(0, 0, -90);
         }
     }
     public void RotateLeft()
     {
         if (canRotate)
         {
-            transform.Rotate(0, 0, -90);
+            transform.Rotate(0, 0, 90);
         }
     }
     //ランダムなブロックの中身作成

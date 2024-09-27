@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     bool gameOver;
     float beforerotationZ;
     float afterrotationZ;
-    float setuplimit=0f;
+    float setuplimit = 0f;
     bool setup = false;
 
     private void Start()
@@ -609,7 +609,7 @@ public class GameManager : MonoBehaviour
         holdcheck = true;
 
         setup = false;
-        setuplimit=0f;
+        setuplimit = 0f;
         nextKeyDowntimer = Time.time;
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
