@@ -670,7 +670,6 @@ public class GameManager : MonoBehaviour
         }
     }
     // ゴーストブロックの外観を変更
-    // ゴーストブロックの外観を変更
     void ChangeGhostAppearance()
     {
         foreach (Transform child in ghostBlock.transform)
