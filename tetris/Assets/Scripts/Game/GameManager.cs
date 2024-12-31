@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using System.Linq;
+
 public class GameManager : MonoBehaviour
 {
     Spawner spawner;
@@ -13,18 +15,25 @@ public class GameManager : MonoBehaviour
     Block holdBlock;
     Block saveBlock;
 
-    [SerializeField] private float dropInterval = 0.25f;
+    [SerializeField]
+    private float dropInterval = 0.25f;
     float nextdropTimer = 0.25f;
     Board board;
     HoldSpawner holdSpawner;
 
     private bool holdcheck = true;
 
-    float nextKeyDowntimer, nextKeyLeftRighttimer, nextKeyRotatetimer;
+    float nextKeyDowntimer,
+        nextKeyLeftRighttimer,
+        nextKeyRotatetimer;
 
-    [SerializeField] private float nextKeyDownInterval, nextKeyLeftRightInterval, nextKeyRotateInterval;
+    [SerializeField]
+    private float nextKeyDownInterval,
+        nextKeyLeftRightInterval,
+        nextKeyRotateInterval;
 
-    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField]
+    private GameObject gameOverPanel;
 
     bool gameOver;
     float beforerotationZ;
@@ -34,7 +43,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-
         spawner = GameObject.FindObjectOfType<Spawner>();
 
         board = GameObject.FindObjectOfType<Board>();
@@ -70,6 +78,7 @@ public class GameManager : MonoBehaviour
 
         return spawner.SpawnBlock(nextBlock);
     }
+
     //動く処理
     private void Update()
     {
@@ -79,8 +88,8 @@ public class GameManager : MonoBehaviour
         }
         PlayerInput();
         UpdateGhostBlock();
-
     }
+
     void PlayerInput()
     {
         //ホールド
@@ -107,7 +116,10 @@ public class GameManager : MonoBehaviour
             }
         }
         //右
-        else if (Input.GetKey(KeyCode.RightArrow) && (Time.time > nextKeyLeftRighttimer) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if (
+            Input.GetKey(KeyCode.RightArrow) && (Time.time > nextKeyLeftRighttimer)
+            || Input.GetKeyDown(KeyCode.RightArrow)
+        )
         {
             activeBlock.MoveRight();
 
@@ -118,7 +130,10 @@ public class GameManager : MonoBehaviour
             }
         }
         //左
-        else if (Input.GetKey(KeyCode.LeftArrow) && (Time.time > nextKeyLeftRighttimer) || Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (
+            Input.GetKey(KeyCode.LeftArrow) && (Time.time > nextKeyLeftRighttimer)
+            || Input.GetKeyDown(KeyCode.LeftArrow)
+        )
         {
             activeBlock.MoveLeft();
 
@@ -129,7 +144,10 @@ public class GameManager : MonoBehaviour
             }
         }
         //右回転
-        else if (Input.GetKey(KeyCode.UpArrow) && (Time.time > nextKeyRotatetimer) || Input.GetKeyDown(KeyCode.UpArrow))
+        else if (
+            Input.GetKey(KeyCode.UpArrow) && (Time.time > nextKeyRotatetimer)
+            || Input.GetKeyDown(KeyCode.UpArrow)
+        )
         {
             beforerotationZ = activeBlock.transform.eulerAngles.z;
             activeBlock.RotateRight();
@@ -140,7 +158,10 @@ public class GameManager : MonoBehaviour
             }
         }
         //左回転
-        else if (Input.GetKey(KeyCode.Z) && (Time.time > nextKeyRotatetimer) || Input.GetKeyDown(KeyCode.Z))
+        else if (
+            Input.GetKey(KeyCode.Z) && (Time.time > nextKeyRotatetimer)
+            || Input.GetKeyDown(KeyCode.Z)
+        )
         {
             beforerotationZ = activeBlock.transform.eulerAngles.z;
             activeBlock.RotateLeft();
@@ -163,7 +184,10 @@ public class GameManager : MonoBehaviour
                 }
             }
             activeBlock.MoveUp();
-            if (Input.GetKey(KeyCode.DownArrow) && (Time.time > nextKeyDowntimer) || Time.time > nextdropTimer)
+            if (
+                Input.GetKey(KeyCode.DownArrow) && (Time.time > nextKeyDowntimer)
+                || Time.time > nextdropTimer
+            )
             {
                 activeBlock.MoveDown();
 
@@ -188,10 +212,10 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     //回転の処理
     void TryRotateLeftRight(Block block, int rotate)
     {
-
         afterrotationZ = block.transform.eulerAngles.z;
         Vector3 savePosition = block.transform.position;
         Vector3 savePosition1 = block.transform.position;
@@ -209,7 +233,6 @@ public class GameManager : MonoBehaviour
                             for (int i = 0; i < 2; ++i)
                             {
                                 block.MoveLeft();
-
                             }
                             savePosition1 = block.transform.position;
                             break;
@@ -280,7 +303,6 @@ public class GameManager : MonoBehaviour
                     break;
             }
 
-
             if (!board.IsWithinPosition(block))
             {
                 switch (afterrotationZ)
@@ -329,7 +351,6 @@ public class GameManager : MonoBehaviour
                                 }
                                 savePosition2 = block.transform.position;
                                 break;
-
                         }
                         break;
                     //C
@@ -352,10 +373,8 @@ public class GameManager : MonoBehaviour
                                 }
                                 savePosition2 = block.transform.position;
                                 break;
-
                         }
                         break;
-
                 }
                 if (!board.IsWithinPosition(block))
                 {
@@ -402,7 +421,6 @@ public class GameManager : MonoBehaviour
                             }
                             break;
                     }
-
 
                     if (!board.IsWithinPosition(block))
                     {
@@ -583,6 +601,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     //底についたときの処理
     void BottomBoard()
     {
@@ -596,6 +615,7 @@ public class GameManager : MonoBehaviour
 
         //座標を保存
         board.SaveBlockInGrid(activeBlock);
+        CheckAdjacentBlockNumbers();
         // 次のブロックをスポーン
         activeBlock = GetNextBlock();
         while (!board.IsWithinPosition(activeBlock))
@@ -618,6 +638,68 @@ public class GameManager : MonoBehaviour
         //削除
         board.ClearAllRows();
     }
+    private void CheckAdjacentBlockNumbers()
+    {
+        if (activeBlock != null)
+        {
+            BlockPeace[] blockPeaces = activeBlock.GetComponentsInChildren<BlockPeace>();
+            blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToArray();
+            HashSet<BlockPeace> visited = new HashSet<BlockPeace>();
+
+            foreach (BlockPeace blockPeace in blockPeaces)
+            {
+                if (!visited.Contains(blockPeace))
+                {
+                    int count = ExploreBlock(blockPeace, visited);
+                    Debug.Log(blockPeace.Number + "につながっているブロックは" + count);
+                }
+            }
+        }
+    }
+
+    private int ExploreBlock(BlockPeace blockPeace, HashSet<BlockPeace> visited)
+    {
+        Stack<BlockPeace> stack = new Stack<BlockPeace>();
+        stack.Push(blockPeace);
+        int count = 0;
+
+        Vector2Int[] directions = new Vector2Int[]
+        {
+            Vector2Int.left,
+            Vector2Int.right,
+            Vector2Int.up,
+            Vector2Int.down
+        };
+
+        while (stack.Count > 0)
+        {
+            BlockPeace current = stack.Pop();
+            if (visited.Contains(current))
+            {
+                continue;
+            }
+
+            visited.Add(current);
+            count++;
+
+            Vector2Int blockPosition = Rounding.RoundToInt(current.transform.position);
+            foreach (Vector2Int direction in directions)
+            {
+                Vector2Int checkPosition = blockPosition + direction;
+                Transform neighborTransform = board.GetBlockAtPosition(checkPosition);
+                if (neighborTransform != null)
+                {
+                    BlockPeace adjacentBlockPeace = neighborTransform.GetComponent<BlockPeace>();
+                    if (adjacentBlockPeace != null && adjacentBlockPeace.Number == current.Number && !visited.Contains(adjacentBlockPeace))
+                    {
+                        stack.Push(adjacentBlockPeace);
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
     //ホールド機能
     void Hold()
     {
@@ -637,12 +719,12 @@ public class GameManager : MonoBehaviour
                 //ゴーストブロックの変更
                 Destroy(ghostBlock.gameObject);
                 CreateGhostBlock();
-
             }
             holdBlock = holdSpawner.HoldBlock(saveBlock);
             holdcheck = false;
         }
     }
+
     //ゲームオーバー
     void GameOver()
     {
@@ -659,16 +741,22 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+
     // ゴーストブロックを作成
     void CreateGhostBlock()
     {
         if (activeBlock != null)
         {
-            ghostBlock = Instantiate(activeBlock, activeBlock.transform.position, activeBlock.transform.rotation);
+            ghostBlock = Instantiate(
+                activeBlock,
+                activeBlock.transform.position,
+                activeBlock.transform.rotation
+            );
             // ゴーストブロックの色や透明度を変更
             ChangeGhostAppearance();
         }
     }
+
     // ゴーストブロックの外観を変更
     void ChangeGhostAppearance()
     {
@@ -679,12 +767,12 @@ public class GameManager : MonoBehaviour
             {
                 // ゴーストブロックの透明度を設定
                 Color color = renderer.color;
-                color.a = 0f;  // 透明度を設定
+                color.a = 0f; // 透明度を設定
                 renderer.color = color;
 
                 // ゴーストブロックの描画順を後ろに設定
-                renderer.sortingOrder = -1;  // アクティブブロックより低い値にする
-                                             // ゴーストブロックのすべての子オブジェクトからCanvasを持つものを取得して処理
+                renderer.sortingOrder = -1; // アクティブブロックより低い値にする
+                // ゴーストブロックのすべての子オブジェクトからCanvasを持つものを取得して処理
                 foreach (Canvas childCanvas in ghostBlock.GetComponentsInChildren<Canvas>())
                 {
                     childCanvas.sortingOrder = -1;
@@ -692,6 +780,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     // ゴーストブロックをアップデート
     void UpdateGhostBlock()
     {
@@ -712,4 +801,3 @@ public class GameManager : MonoBehaviour
         }
     }
 }
-

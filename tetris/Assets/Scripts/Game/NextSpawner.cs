@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class NextSpawner : MonoBehaviour
 {
-    [SerializeField] Block[] Blocks;  // ブロックの配列
-    [SerializeField] Transform[] nextBlockPositions; // 5つのブロックを表示する位置
+    [SerializeField]
+    Block[] Blocks; // ブロックの配列
+
+    [SerializeField]
+    Transform[] nextBlockPositions; // 5つのブロックを表示する位置
     private Queue<Block> nextBlocksQueue = new Queue<Block>(); // 次のブロックを管理するキュー
     private List<Block> availableBlocks;
     Block nextBlock;

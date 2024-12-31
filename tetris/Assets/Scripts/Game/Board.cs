@@ -7,16 +7,24 @@ public class Board : MonoBehaviour
 {
     private Transform[,] grid;
 
-    [SerializeField] private Transform tetrisFlame;
-    [SerializeField] private int height = 30, width = 10, header = 8;//ボードの大きさ
+    [SerializeField]
+    private Transform tetrisFlame;
+
+    [SerializeField]
+    private int height = 30,
+        width = 10,
+        header = 8; //ボードの大きさ
+
     private void Awake()
     {
         grid = new Transform[width, height];
     }
+
     private void Start()
     {
         CreateBoard();
     }
+
     //フィールドの作成
     void CreateBoard()
     {
@@ -26,12 +34,17 @@ public class Board : MonoBehaviour
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Transform clone = Instantiate(tetrisFlame, new Vector3(x, y, 0), Quaternion.identity);
+                    Transform clone = Instantiate(
+                        tetrisFlame,
+                        new Vector3(x, y, 0),
+                        Quaternion.identity
+                    );
                     clone.transform.parent = transform;
                 }
             }
         }
     }
+
     //はみ出てないかのチェック
     public bool IsWithinPosition(Block block)
     {
@@ -50,16 +63,19 @@ public class Board : MonoBehaviour
         }
         return true;
     }
+
     //枠内判定
     bool BoardOutCheck(int x, int y)
     {
         return (x >= 0 && x < width && y >= 0);
     }
+
     //他のブロックがないか判定
     bool BlockCheck(int x, int y, Block block)
     {
         return (grid[x, y] != null && grid[x, y].parent != block.transform);
     }
+
     //ブロックの座標を記録
     public void SaveBlockInGrid(Block block)
     {
@@ -70,6 +86,7 @@ public class Board : MonoBehaviour
             grid[(int)pos.x, (int)pos.y] = item;
         }
     }
+
     //消す処理
     public void ClearAllRows()
     {
@@ -85,6 +102,7 @@ public class Board : MonoBehaviour
             }
         }
     }
+
     //全部埋まってるかの確認
     bool IsComplate(int y)
     {
@@ -97,6 +115,7 @@ public class Board : MonoBehaviour
         }
         return true;
     }
+
     //一列消す
     void ClearRow(int y)
     {
@@ -109,6 +128,7 @@ public class Board : MonoBehaviour
             grid[x, y] = null;
         }
     }
+
     //上にある奴らを一個落とす
     void ShiftRowsDown(int startY)
     {
@@ -131,11 +151,21 @@ public class Board : MonoBehaviour
     {
         foreach (Transform item in block.transform)
         {
-            if (item.transform.position.y+1 >= height - header)
+            if (item.transform.position.y + 1 >= height - header)
             {
                 return true;
             }
         }
         return false;
     }
+    // 指定された位置にあるブロックを取得するメソッド
+    public Transform GetBlockAtPosition(Vector2Int position)
+    {
+        if (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height)
+        {
+            return grid[position.x, position.y];
+        }
+        return null;
+    }
+
 }

@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class SoundManager : MonoBehaviour
 {
-    [SerializeField] AudioSource bgmAudioSource;
-    [SerializeField] AudioSource seAudioSource;
+    [SerializeField]
+    AudioSource bgmAudioSource;
 
-    [SerializeField] List<BGMSoundData> bgmSoundDatas;
-    [SerializeField] List<SESoundData> seSoundDatas;
+    [SerializeField]
+    AudioSource seAudioSource;
+
+    [SerializeField]
+    List<BGMSoundData> bgmSoundDatas;
+
+    [SerializeField]
+    List<SESoundData> seSoundDatas;
 
     public static float masterVolume = 1;
     public static float bgmMasterVolume = 1;
     public static float seMasterVolume = 1;
-    private float datavolume=0f;
+    private float datavolume = 0f;
 
     public static SoundManager Instance { get; private set; }
 
@@ -33,7 +38,7 @@ public class SoundManager : MonoBehaviour
 
     void Update()
     {
-        bgmAudioSource.volume = datavolume*bgmMasterVolume * masterVolume;
+        bgmAudioSource.volume = datavolume * bgmMasterVolume * masterVolume;
     }
 
     public void PlayBGM(BGMSoundData.BGM bgm)
@@ -50,7 +55,6 @@ public class SoundManager : MonoBehaviour
         seAudioSource.volume = data.volume * seMasterVolume * masterVolume;
         seAudioSource.PlayOneShot(data.audioClip);
     }
-
 }
 
 [System.Serializable]
@@ -58,11 +62,12 @@ public class BGMSoundData
 {
     public enum BGM
     {
-        All,//ラベル
+        All, //ラベル
     }
 
     public BGM bgm;
     public AudioClip audioClip;
+
     [Range(0, 1)]
     public float volume = 1;
 }
@@ -73,13 +78,14 @@ public class SESoundData
     public enum SE
     {
         Correct,
-        InCorrect,// これがラベルになる
+        InCorrect, // これがラベルになる
         Clear,
         GameOver,
     }
 
     public SE se;
     public AudioClip audioClip;
+
     [Range(0, 1)]
     public float volume = 1;
 }

@@ -10,8 +10,14 @@ public static class Rounding
     {
         return new Vector2(Mathf.Round(i.x), Mathf.Round(i.y));
     }
+
     public static Vector3 Round(Vector3 i)
     {
-        return new Vector3(Mathf.Round(i.x), Mathf.Round(i.y));
+        return new Vector3(Mathf.Round(i.x), Mathf.Round(i.y), Mathf.Round(i.z));
+    }
+
+    public static Vector2Int RoundToInt(Vector3 i)
+    {
+        return new Vector2Int(Mathf.RoundToInt(i.x), Mathf.RoundToInt(i.y));
     }
 }

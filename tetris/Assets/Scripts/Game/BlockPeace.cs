@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class BlockPeace : MonoBehaviour
 {
-
+    public int Number;
 }
