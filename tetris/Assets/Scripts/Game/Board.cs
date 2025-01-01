@@ -10,7 +10,6 @@ public class Board : MonoBehaviour
     [SerializeField]
     private Transform tetrisFlame;
 
-    [SerializeField]
     private int height = 30,
         width = 10,
         header = 8; //ボードの大きさ
@@ -158,6 +157,7 @@ public class Board : MonoBehaviour
         }
         return false;
     }
+
     // 指定された位置にあるブロックを取得するメソッド
     public Transform GetBlockAtPosition(Vector2Int position)
     {
@@ -168,4 +168,15 @@ public class Board : MonoBehaviour
         return null;
     }
 
+    public void RemoveBlock(Vector2Int position)
+    {
+        if (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height)
+        {
+            if (grid[position.x, position.y] != null)
+            {
+                Destroy(grid[position.x, position.y].gameObject);
+                grid[position.x, position.y] = null;
+            }
+        }
+    }
 }

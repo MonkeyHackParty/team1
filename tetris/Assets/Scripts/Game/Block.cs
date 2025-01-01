@@ -10,8 +10,8 @@ public class Block : MonoBehaviour
     [SerializeField]
     private bool canRotate = true;
 
-    [SerializeField]
-    PeaceSpawn[] peaceSpawns;
+    public List<int> peaceNumber = new List<int> { 2, 4, 8, 16 };
+    [SerializeField] BlockPeace[] blockPeaces;
 
     //動き方
     void Move(Vector3 moveDirection)
@@ -60,13 +60,11 @@ public class Block : MonoBehaviour
     //ランダムなブロックの中身作成
     public void MakeRandomPeace()
     {
-        if (peaceSpawns != null && peaceSpawns.Length > 0)
+        foreach (BlockPeace blockPeace in blockPeaces)
         {
-            // 全ての PeaceSpawn に対して SpawnBlockPeace を呼び出す
-            foreach (PeaceSpawn spawn in peaceSpawns)
-            {
-                spawn.SpawnBlockPeace();
-            }
+            int randomIndex = Random.Range(0, peaceNumber.Count);
+            int randomPeaceNumber = peaceNumber[randomIndex];
+            blockPeace.SetNumber(randomPeaceNumber);
         }
     }
 }

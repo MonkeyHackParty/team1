@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using System.Linq;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -644,20 +645,31 @@ public class GameManager : MonoBehaviour
         {
             BlockPeace[] blockPeaces = activeBlock.GetComponentsInChildren<BlockPeace>();
             blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToArray();
-            HashSet<BlockPeace> visited = new HashSet<BlockPeace>();
 
             foreach (BlockPeace blockPeace in blockPeaces)
             {
+                HashSet<BlockPeace> visited = new HashSet<BlockPeace>();
                 if (!visited.Contains(blockPeace))
                 {
-                    int count = ExploreBlock(blockPeace, visited);
-                    Debug.Log(blockPeace.Number + "につながっているブロックは" + count);
+                    ExploreBlock(blockPeace, visited);
+                    int count = visited.Count;
+                    if (count >= 2)
+                    {
+                        foreach (BlockPeace bp in visited)
+                        {
+                            Vector2Int pos = Rounding.RoundToInt(bp.transform.position);
+                            board.RemoveBlock(pos);
+                        }
+                        int n=(int)Mathf.Pow(2, count-1);
+                        int newNumber = n*blockPeace.Number;
+                        Debug.Log(newNumber);
+                    }
                 }
             }
         }
     }
 
-    private int ExploreBlock(BlockPeace blockPeace, HashSet<BlockPeace> visited)
+    private void ExploreBlock(BlockPeace blockPeace, HashSet<BlockPeace> visited)
     {
         Stack<BlockPeace> stack = new Stack<BlockPeace>();
         stack.Push(blockPeace);
@@ -697,8 +709,6 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-
-        return count;
     }
     //ホールド機能
     void Hold()
