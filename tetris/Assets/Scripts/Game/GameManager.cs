@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using System.Linq;
 using System;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -635,38 +636,85 @@ public class GameManager : MonoBehaviour
         nextKeyLeftRighttimer = Time.time;
         nextKeyRotatetimer = Time.time;
         nextdropTimer = Time.time + dropInterval;
-
-        //削除
-        board.ClearAllRows();
     }
+
     private void CheckAdjacentBlockNumbers()
     {
         if (activeBlock != null)
         {
-            BlockPeace[] blockPeaces = activeBlock.GetComponentsInChildren<BlockPeace>();
-            blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToArray();
+            List<BlockPeace> blockPeaces = activeBlock.GetComponentsInChildren<BlockPeace>().ToList();
+            MargeBlock(blockPeaces);
+        }
+    }
 
-            foreach (BlockPeace blockPeace in blockPeaces)
+    void MargeBlock(List<BlockPeace> blockPeaces)
+    {
+        blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToList();
+        HashSet<BlockPeace> movedBlocks = new HashSet<BlockPeace>();
+        List<Vector3Int> positions = new List<Vector3Int>();
+        for (int i = 0; i < blockPeaces.Count; i++)
+        {
+            BlockPeace blockPeace = blockPeaces[i];
+            HashSet<BlockPeace> visited = new HashSet<BlockPeace>();
+            if (!visited.Contains(blockPeace))
             {
-                HashSet<BlockPeace> visited = new HashSet<BlockPeace>();
-                if (!visited.Contains(blockPeace))
+                ExploreBlock(blockPeace, visited);
+                int count = visited.Count;
+                if (count >= 2)
                 {
-                    ExploreBlock(blockPeace, visited);
-                    int count = visited.Count;
-                    if (count >= 2)
+                    Vector3 newPos = visited.OrderBy(bp => bp.transform.position.y).First().transform.position;
+                    // コルーチンを格納するリスト
+                    List<IEnumerator> moveCoroutines = new List<IEnumerator>();
+                    foreach (BlockPeace bp in visited)
                     {
-                        foreach (BlockPeace bp in visited)
+                        Vector3Int pos = Vector3Int.RoundToInt(bp.transform.position);
+                        board.RemoveBlock(pos);
+
+                        if (pos != Rounding.Round(newPos))
                         {
-                            Vector2Int pos = Rounding.RoundToInt(bp.transform.position);
-                            board.RemoveBlock(pos);
+                            positions.Add(pos);
                         }
-                        int n=(int)Mathf.Pow(2, count-1);
-                        int newNumber = n*blockPeace.Number;
-                        Debug.Log(newNumber);
+                        BlockMover blockMover = bp.gameObject.AddComponent<BlockMover>();
+                        // コルーチンをリストに追加
+                        moveCoroutines.Add(blockMover.MoveToPosition(newPos, 0.5f));
                     }
+
+                    // すべてのコルーチンが終了するまで待機
+                    StartCoroutine(WaitForAllCoroutines(moveCoroutines, () =>
+                    {
+                        // すべての移動が終わった後に実行する処理
+                        int n = (int)Mathf.Pow(2, count - 1);
+                        int newNumber = n * blockPeace.Number;
+                        Debug.Log(newNumber);
+                        BlockPeace newBlockPeace = board.CreateNewBlock(newPos, newNumber);
+                        blockPeaces.Add(newBlockPeace);
+                        blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToList();
+
+                    }));
+
                 }
             }
         }
+        positions = positions.OrderByDescending(pos => pos.y).ToList();
+        foreach (Vector3Int pos in positions)
+        {
+            movedBlocks.AddRange(board.ShiftRowsDownColumn(pos.x, pos.y + 1));
+        }
+        blockPeaces = movedBlocks.ToList();
+        if (blockPeaces.Count > 0)
+        {
+            MargeBlock(blockPeaces);
+        }
+    }
+
+    private IEnumerator WaitForAllCoroutines(List<IEnumerator> coroutines, System.Action onComplete)
+    {
+        foreach (var coroutine in coroutines)
+        {
+            yield return StartCoroutine(coroutine);
+        }
+
+        onComplete?.Invoke();
     }
 
     private void ExploreBlock(BlockPeace blockPeace, HashSet<BlockPeace> visited)

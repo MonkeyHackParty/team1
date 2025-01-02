@@ -9,6 +9,7 @@ public class Board : MonoBehaviour
 
     [SerializeField]
     private Transform tetrisFlame;
+    [SerializeField] private BlockPeace blockPeace;
 
     private int height = 30,
         width = 10,
@@ -131,18 +132,29 @@ public class Board : MonoBehaviour
     //上にある奴らを一個落とす
     void ShiftRowsDown(int startY)
     {
+        for (int x = 0; x < width; x++)
+        {
+            ShiftRowsDownColumn(x, startY);
+        }
+    }
+    public List<BlockPeace> ShiftRowsDownColumn(int x, int startY)
+    {
+        List<BlockPeace> movedBlocks = new List<BlockPeace>();
         for (int y = startY; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            if (grid[x, y] != null)
             {
-                if (grid[x, y] != null)
+                grid[x, y - 1] = grid[x, y];
+                grid[x, y] = null;
+                grid[x, y - 1].position += new Vector3(0, -1, 0);
+                BlockPeace blockPeace = grid[x, y - 1].GetComponent<BlockPeace>();
+                if (blockPeace != null)
                 {
-                    grid[x, y - 1] = grid[x, y];
-                    grid[x, y] = null;
-                    grid[x, y - 1].position += new Vector3(0, -1, 0);
+                    movedBlocks.Add(blockPeace);
                 }
             }
         }
+        return movedBlocks;
     }
 
     //ブロックが上についてしまったか
@@ -168,15 +180,25 @@ public class Board : MonoBehaviour
         return null;
     }
 
-    public void RemoveBlock(Vector2Int position)
+    public void RemoveBlock(Vector3Int position)
     {
         if (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height)
         {
             if (grid[position.x, position.y] != null)
             {
-                Destroy(grid[position.x, position.y].gameObject);
                 grid[position.x, position.y] = null;
             }
         }
+    }
+    public BlockPeace CreateNewBlock(Vector3 newPos, int newNumber)
+    {
+        BlockPeace newBlockPeace = Instantiate(blockPeace, newPos, Quaternion.identity);
+        newBlockPeace.SetNumber(newNumber);
+        Vector2Int gridPos = Rounding.RoundToInt(newPos);
+        if (gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height)
+        {
+            grid[gridPos.x, gridPos.y] = newBlockPeace.transform;
+        }
+        return newBlockPeace;
     }
 }

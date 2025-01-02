@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tetrisFlame: {fileID: 38650297866754571, guid: ac27037205a31d745b206b8970e9658c, type: 3}
-  blockPeace: {fileID: 0}
+  blockPeace: {fileID: 2576062442959856842, guid: 230d8b95977d6490b8e24d7131ae6504, type: 3}
 --- !u!1 &618546495
 GameObject:
   m_ObjectHideFlags: 0
