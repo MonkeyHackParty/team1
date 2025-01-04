@@ -88,8 +88,11 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        PlayerInput();
-        UpdateGhostBlock();
+        if (activeBlock != null)
+        {
+            PlayerInput();
+            UpdateGhostBlock();
+        }
     }
 
     void PlayerInput()
@@ -617,7 +620,16 @@ public class GameManager : MonoBehaviour
 
         //座標を保存
         board.SaveBlockInGrid(activeBlock);
-        CheckAdjacentBlockNumbers();
+        Block savedBlock = activeBlock;
+        activeBlock = null;
+        Debug.Log("BottomBoard");
+        Destroy(ghostBlock.gameObject);
+        StartCoroutine(BottomBoardCoroutine(savedBlock));
+    }
+    private IEnumerator BottomBoardCoroutine(Block savedBlock)
+    {
+        Debug.Log("BottomBoardCoroutine");
+        yield return StartCoroutine(CheckAdjacentBlockNumbers(savedBlock));
         // 次のブロックをスポーン
         activeBlock = GetNextBlock();
         while (!board.IsWithinPosition(activeBlock))
@@ -625,7 +637,6 @@ public class GameManager : MonoBehaviour
             activeBlock.MoveUp();
         }
         //ゴーストブロックの変更
-        Destroy(ghostBlock.gameObject);
         CreateGhostBlock();
 
         holdcheck = true;
@@ -638,16 +649,17 @@ public class GameManager : MonoBehaviour
         nextdropTimer = Time.time + dropInterval;
     }
 
-    private void CheckAdjacentBlockNumbers()
+    private IEnumerator CheckAdjacentBlockNumbers(Block savedBlock)
     {
-        if (activeBlock != null)
+        if (savedBlock != null)
         {
-            List<BlockPeace> blockPeaces = activeBlock.GetComponentsInChildren<BlockPeace>().ToList();
-            MargeBlock(blockPeaces);
+            Debug.Log("CheckAdjacentBlockNumbers");
+            List<BlockPeace> blockPeaces = savedBlock.GetComponentsInChildren<BlockPeace>().ToList();
+            yield return StartCoroutine(MargeBlock(blockPeaces));
         }
     }
 
-    void MargeBlock(List<BlockPeace> blockPeaces)
+    private IEnumerator MargeBlock(List<BlockPeace> blockPeaces)
     {
         blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToList();
         HashSet<BlockPeace> movedBlocks = new HashSet<BlockPeace>();
@@ -663,38 +675,25 @@ public class GameManager : MonoBehaviour
                 if (count >= 2)
                 {
                     Vector3 newPos = visited.OrderBy(bp => bp.transform.position.y).First().transform.position;
-                    // コルーチンを格納するリスト
-                    List<IEnumerator> moveCoroutines = new List<IEnumerator>();
+
                     foreach (BlockPeace bp in visited)
                     {
-                        Vector3Int pos = Vector3Int.RoundToInt(bp.transform.position);
-                        board.RemoveBlock(pos);
-
-                        if (pos != Rounding.Round(newPos))
-                        {
-                            positions.Add(pos);
-                        }
-                        BlockMover blockMover = bp.gameObject.AddComponent<BlockMover>();
-                        // コルーチンをリストに追加
-                        moveCoroutines.Add(blockMover.MoveToPosition(newPos, 0.5f));
+                        yield return StartCoroutine(AnimationMargeBlock(bp, newPos, positions));
                     }
 
-                    // すべてのコルーチンが終了するまで待機
-                    StartCoroutine(WaitForAllCoroutines(moveCoroutines, () =>
-                    {
-                        // すべての移動が終わった後に実行する処理
-                        int n = (int)Mathf.Pow(2, count - 1);
-                        int newNumber = n * blockPeace.Number;
-                        Debug.Log(newNumber);
-                        BlockPeace newBlockPeace = board.CreateNewBlock(newPos, newNumber);
-                        blockPeaces.Add(newBlockPeace);
-                        blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToList();
-
-                    }));
-
+                    int n = (int)Mathf.Pow(2, count - 1);
+                    int newNumber = n * blockPeace.Number;
+                    Debug.Log(newNumber);
+                    BlockPeace newBlockPeace = board.CreateNewBlock(newPos, newNumber);
+                    yield return new WaitUntil(() => visited.All(bp => bp == null));
+                    blockPeaces.Add(newBlockPeace);
+                    blockPeaces = blockPeaces.OrderBy(bp => bp.Number).ToList();
                 }
             }
+            Debug.Log("MargeBlock");
         }
+
+
         positions = positions.OrderByDescending(pos => pos.y).ToList();
         foreach (Vector3Int pos in positions)
         {
@@ -703,19 +702,25 @@ public class GameManager : MonoBehaviour
         blockPeaces = movedBlocks.ToList();
         if (blockPeaces.Count > 0)
         {
-            MargeBlock(blockPeaces);
+            yield return StartCoroutine(MargeBlock(blockPeaces));
         }
     }
-
-    private IEnumerator WaitForAllCoroutines(List<IEnumerator> coroutines, System.Action onComplete)
+    private IEnumerator AnimationMargeBlock(BlockPeace bp, Vector3 newPos, List<Vector3Int> positions)
     {
-        foreach (var coroutine in coroutines)
+
+        Vector3Int pos = Vector3Int.RoundToInt(bp.transform.position);
+        board.RemoveBlock(pos);
+
+        if (pos != Rounding.Round(newPos))
         {
-            yield return StartCoroutine(coroutine);
+            positions.Add(pos);
         }
 
-        onComplete?.Invoke();
+        BlockMover blockMover = bp.gameObject.AddComponent<BlockMover>();
+        StartCoroutine(blockMover.MoveToPosition(newPos, 0.5f));
+        yield return null;
     }
+
 
     private void ExploreBlock(BlockPeace blockPeace, HashSet<BlockPeace> visited)
     {
@@ -734,7 +739,7 @@ public class GameManager : MonoBehaviour
         while (stack.Count > 0)
         {
             BlockPeace current = stack.Pop();
-            if (visited.Contains(current))
+            if (visited.Contains(current) || current == null)
             {
                 continue;
             }
@@ -842,7 +847,7 @@ public class GameManager : MonoBehaviour
     // ゴーストブロックをアップデート
     void UpdateGhostBlock()
     {
-        if (ghostBlock != null)
+        if (ghostBlock != null && activeBlock != null)
         {
             // ゴーストブロックをアクティブブロックと同じ位置に配置
             ghostBlock.transform.position = activeBlock.transform.position;
