@@ -88,18 +88,13 @@ public class Board : MonoBehaviour
     }
 
     //消す処理
-    public void ClearAllRows()
+    public void ClearAllRows(int y)
     {
-        for (int y = 0; y < height; y++)
         {
-            if (IsComplate(y))
-            {
-                ClearRow(y);
+            ClearRow(y);
 
-                ShiftRowsDown(y + 1);
+            ShiftRowsDown(y + 1);
 
-                y--;
-            }
         }
     }
 
